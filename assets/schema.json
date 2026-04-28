@@ -1,0 +1,29 @@
+{
+  "$schema": "https://frictionlessdata.io/schemas/table-schema.json",
+  "fields": [
+    {
+      "name": "date",
+      "type": "datetime",
+      "format": "%Y-%m-%dT%H:%M:%SZ",
+      "title": "Datum",
+      "description": "Zeitstempel der Messung im ISO 8601 Format"
+    },
+    {
+      "name": "value",
+      "type": "number",
+      "title": "Wert",
+      "description": "Numerischer Messwert"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "title": "Kategorie",
+      "description": "Optionale Gruppierungskategorie",
+      "constraints": {
+        "required": false
+      }
+    }
+  ],
+  "primaryKey": ["date"],
+  "missingValues": ["", "null"]
+}

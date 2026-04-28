@@ -1,0 +1,22 @@
+Datenspezifikation für die App:
+Die Daten müssen als CSV-Datei mit Komma als Trennzeichen bereitgestellt werden. 
+Die erste Zeile enthält die Spaltennamen (Header), gefolgt von den Datensätzen.
+
+Erforderliche Spalten:
+- "date": ISO-Datum im Format YYYY-MM-DDTHH:mm:ssZ (String)
+- "value": numerischer Wert (Zahl)
+
+Optionale Spalten:
+- "category": Gruppierungsmerkmal (String)
+
+Beispiel CSV-Format:
+date,value,category
+2025-01-01T00:00:00Z,43.87,A
+2025-01-02T00:00:00Z,72.47,B
+2025-01-03T00:00:00Z,39.49,A
+
+Hinweise:
+- Dezimalzahlen können Punkt oder Komma als Dezimaltrennzeichen verwenden
+- Leere Werte werden als 0 interpretiert
+- Die Reihenfolge der Spalten ist flexibel, wichtig sind die Spaltennamen
+- Zusätzliche Spalten werden ignoriert, aber nicht gelöscht

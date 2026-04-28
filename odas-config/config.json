@@ -1,0 +1,38 @@
+{
+  "apiVersion": "1",
+  "titel": "Realtime Data View",
+  "seitentitel": "Realtime Data View App",
+  "icon": "logo_ondics.png",
+  "brandingCSS": "",
+  "dateneinheit": "",
+  "datenpunktlimit": 50,
+  "beschreibung": [
+    "Die App ist eine ",
+    "generische welche\n",
+    "wosweitergeht\n",
+    "## titel \n",
+    "und normaler text."
+  ],
+  "kontakt": [
+    "Tel.: <a href='tel:+49711310093100'>0711-31009-3100</a><br>",
+    "Fax: <a href='tel:+49711310093108'>0711-31009-3108</a><br>",
+    "E-Mail: <a href='mailto:info@ondics.de'>info@ondics.de</a>"
+  ],
+  "impressum": [
+    "Ondics GmbH<br>",
+    "Wolfgang Clauss<br>Blumenstrasse 19<br>",
+    "<a href='https://www.ondics.de/' target='_blank'>https://www.ondics.de/</a>"
+  ],
+  "datenschutz": "umfangreicher Text...",
+  "urlODP": "https://open-data-musterstadt.ckan.de",
+  "urlDaten": "https://open-data-musterstadt.ckan.de/dataset/verlaufstestdaten",
+  "fusszeile": [
+    "(C) Copyright 2025 | ",
+    "für den Inhalt: Ondics GmbH | ",
+    "App-Entwickler: Ondics GmbH | ",
+    "Provided by: Ondics GmbH"
+  ],
+  "apiurl": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv",
+  "sprache": "de",
+  "chartType": "Aggregate Bar Chart"
+}

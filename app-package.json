@@ -1,0 +1,229 @@
+{
+  "app-entwickler-id": "12343",
+  "app-entwickler-name": "ondics-gmbh",
+  "name-in-url": "realtime-data-view",
+  "name": "Realtime Data View",
+  "version": "1.0.0",
+  "odas-app-icon": "assets/odas-app-icon.svg",
+  "app-icon": "assets/odas-app-icon.svg",
+  "kurzbeschreibung": "Diese Open Data App ist zur Visualisierung von Realtime Data.",
+  "beschreibung": [
+    "_multiline_",
+    "Die Open Data App ist zur Visualisierung von Realtime Data. ",
+    "Die Daten werden aus einem Open Data Portal bezogen. ",
+    "Die App kann für Echt-/Sensordatenazeige genutzt werden.",
+    "Erforderliche Spalten:",
+    "date: ISO-Datum im Format YYYY-MM-DDTHH:mm:ssZ (String)",
+    "value: numerischer Wert (Zahl)",
+    "Optionale Spalten:",
+    "category: Gruppierungsmerkmal (String)"
+  ],
+  "tags-funktion": ["Visualisierung"],
+  "tags-dateityp": ["CSV"],
+  "tags-datenart": ["Beliebig"],
+  "screenshots": ["/assets/Desktop_Screenshot.png"],
+  "branding-css": "",
+  "api-version": "1",
+  "instanz-config": {
+    "dateneinheit": {
+      "label": "Daten Einheit",
+      "hilfe": ["Hier wird angegeben in welcher Einheit die Daten sind."],
+      "default": "",
+      "format": {
+        "typ": "string",
+        "laenge": 50
+      },
+      "erforderlich": "ja"
+    },
+    "datenpunktlimit": {
+      "label": "Datenpunkt Limit",
+      "hilfe": [
+        "_multiline_",
+        "Hier kann das Limit eingestellt werden für die Anzeige der Datenpunkte des Datensatzes.",
+        "Das Maximale Limit liegt bei 9999."
+      ],
+      "default": "9999",
+      "format": {
+        "typ": "Zahl",
+        "laenge": 4
+      },
+      "erforderlich": "ja"
+    },
+    "chartType": {
+      "label": "Chart Typ",
+      "hilfe": [
+        "_multiline_",
+        "Hier können Sie den gewünschten Chart Typ angeben mit dem Sie die Daten visualisert werden.",
+        "Zur Auswahl stehen folgende Charts:",
+        "Line Chart, Bar Chart, Area Chart, Point Chart, Tick Chart, Circle Chart, Square Chart, Bar Chart, Text Chart, Line with Color, Stacked Area, Stacked Bar, Layered Line+Point, Trellis Bar, Trellis Line, Histogram, Aggregate Bar Chart"
+      ],
+      "default": "",
+      "format": {
+        "typ": "string",
+        "laenge": 50
+      },
+      "erforderlich": "ja"
+    },
+    "seitentitel": {
+      "label": "Seitentitel",
+      "hilfe": "Der Seitentitel wird im Browser-Tab der App angezeigt",
+      "default": "Realtime Data View ODA",
+      "format": {
+        "typ": "string",
+        "laenge": 50
+      },
+      "erforderlich": "ja"
+    },
+    "lizenz": {
+      "label": "Lizenz",
+      "hilfe": "Angabe der Lizenz, die für die Nutzung der App gilt.",
+      "default": "Open Software License (OSL)",
+      "format": {
+        "typ": "string",
+        "laenge": 50
+      },
+      "erforderlich": "ja"
+    },
+    "titel": {
+      "label": "Titel",
+      "hilfe": "Der Titel wird in der Titelzeile der App angezeigt",
+      "default": "Realtime Data View",
+      "format": {
+        "typ": "string",
+        "laenge": 50
+      },
+      "erforderlich": "ja"
+    },
+    "icon": {
+      "label": "App-Icon",
+      "hilfe": "Das Icon wird links oben in der Titelzeile angezeigt",
+      "default": "{{{odp.logo}}}",
+      "format": {
+        "typ": "image",
+        "hoehe": 100,
+        "breite": 300
+      },
+      "erforderlich": "ja"
+    },
+    "kontakt": {
+      "label": "Kontakt",
+      "hilfe": "Der Text wird im Menüpunkt 'Kontakt' anzeigt",
+      "format": {
+        "typ": "markdown"
+      },
+      "default": [
+        "_multiline_",
+        "Sie sind zufrieden mit der App oder haben Anregungen, Verbesserungen oder Hinweise, die Sie uns mitteilen möchten?",
+        "Dann richten Sie sich gerne an uns. Wir freuen uns über alle Nachrichten. ",
+        "Ihre Nachrichten können Sie uns mitteilen über:",
+        "Tel.: <a href='tel:{{odp.anbieter.telcode}}'>{{odp.anbieter.tel}}</a>",
+        "E-Mail: <a href='mailto:{{odp.anbieter.email}}'>{{odp.anbieter.email}}</a>"
+      ],
+      "erforderlich": "ja"
+    },
+    "beschreibung": {
+      "label": "Beschreibung",
+      "hilfe": "Der Text wird im Menüpunkt 'Über diese App' anzeigt",
+      "format": {
+        "typ": "markdown"
+      },
+      "default": [
+        "_multiline_",
+        "Die Realtime Data View-App zeigt Daten mit der jeweils ausgewählten Visualisierungmethode in Echtzeit.",
+        "Die Daten werden tagesaktuell gehalten. Bei Änderungen versuchen wir, ",
+        "den Datenbestend immer sofort zu aktualisieren. ",
+        "## App-Anbieter",
+        "Die App wird bereit gestellt von <a href=\"{{odp.anbieter.url}}\">{{odp.anbieter.name}}</a>",
+        "## Datenquelle",
+        "Die Daten kommen aus  unserem Open Data Portal <a href=\"{{odp.url}}\">{{odp.name}}</a>",
+        "Die Datenquelle ist in unserem Open Data Portal <a href=\"{{appinstanz.apiurl}}\">{{appinstanz.apiurl}}</a>.",
+        "## Über diese App",
+        "Die App wurde entwickelt von <a href=\"{{app.developer.url}}\">{{app.developer.name}}</a>. App-Version: {{app.version}}.",
+        "## Open Data App Store",
+        "Der Open Data App Store betrieben von <a href=\"{{odas.betreiber.url}}\">{{odas.betreiber.name}}</a>"
+      ],
+      "erforderlich": "ja"
+    },
+    "impressum": {
+      "label": "Impressum",
+      "hilfe": "Der Text wird im Menüpunkt 'Impressum' anzeigt",
+      "format": {
+        "typ": "markdown"
+      },
+      "default": [
+        "_multiline_",
+        "### Anbieter",
+        "",
+        "{{{odp.anbieter.orgName}}}",
+        "{{{odp.anbieter.orgUnit}}}",
+        "",
+        "{{odp.anbieter.strasse}}",
+        "{{odp.anbieter.plzort}}",
+        "",
+        "Website: <a href='{{odp.anbieter.url-extern}}' target='_blank'>{{odp.anbieter.url-extern}}</a>",
+        "",
+        "### Ansprechpartner",
+        "",
+        "{{odp.anbieter.kontakt-bezeichnung}}",
+        "{{odp.anbieter.name}}",
+        "",
+        "### Kontakt",
+        "",
+        "Tel.: {{odp.anbieter.tel}}",
+        "E-Mail: <a href='mailto:{{odp.anbieter.email}}'>{{odp.anbieter.email}}</a>",
+        ""
+      ],
+      "erforderlich": "ja"
+    },
+    "datenschutz": {
+      "label": "Datenschutz",
+      "hilfe": "Der Text wird im Menüpunkt 'Datenschutz' anzeigt",
+      "format": {
+        "typ": "markdown"
+      },
+      "default": ["_multiline_", "Alle Daten sind geschützt."],
+      "erforderlich": "ja"
+    },
+    "urlDaten": {
+      "label": "URL zum Datensatz im ODP",
+      "hilfe": "Der Datensatz im Open Data Portal mit den Daten der Realtime Data View App",
+      "format": {
+        "typ": "url"
+      },
+      "default": "https://open-data-musterstadt.ckan.de/dataset/verlaufstestdaten",
+      "beispiel": "",
+      "erforderlich": "ja"
+    },
+    "fusszeile": {
+      "label": "Fußzeile",
+      "hilfe": "Wird auf der Website unten in der Fusszeile angezeigt.",
+      "format": {
+        "typ": "String",
+        "laenge": 50
+      },
+      "default": "(C) Copyright {{jahr}} | App & Daten: {{odp.anbieter.name}} | App-Entwickler: {{app.developer.name}} | ODAS: {{odas.betreiber.name}}",
+      "erforderlich": "ja"
+    },
+    "apiurl": {
+      "label": "URL zu den Daten",
+      "hilfe": "Von dieser URL zum Datensatz werden die Ressoucen bezogen",
+      "format": {
+        "typ": "url",
+        "laenge": 255
+      },
+      "default": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv",
+      "beispiel": "",
+      "erforderlich": "ja"
+    },
+    "sprache": {
+      "label": "Sprache der App",
+      "hilfe": "Angabe der App-Sprache",
+      "format": {
+        "typ": "dropdown",
+        "optionen": ["de"],
+        "default": "de"
+      },
+      "erforderlich": "ja"
+    }
+  }
+}
