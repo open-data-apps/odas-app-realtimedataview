@@ -7,21 +7,19 @@
   "dateneinheit": "",
   "datenpunktlimit": 50,
   "beschreibung": [
-    "Die Realtime Data View-App visualisiert Echtzeit-Sensordaten aus offenen Datenportalen.",
-    "Die Daten werden als CSV-Dateien geladen und in auswählbaren Diagrammtypen wie Linien-, Balken- oder Flächendiagrammen dargestellt.",
-    "",
-    "## Für wen ist diese App?",
-    "Diese App zeigt Echtzeit-Sensordaten wie Pegelstände, Verkehrszahlen oder Wetterdaten. Sie richtet sich an Bürger:innen und Fachleute, die aktuelle Messwerte im Blick behalten möchten.",
-    "",
-    "## Datenquelle",
-    "Die Daten kommen aus unserem Open Data Portal <a href=\"https://open-data-musterstadt.ckan.de\">Open Data Musterstadt</a>",
-    "Die Datenquelle ist in unserem Open Data Portal <a href=\"https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv\">https://open-data-musterstadt.ckan.de/.../pegelstand_musterbach_messpunkt_vorstadt.csv</a>.",
-    "",
-    "## App-Anbieter",
-    "Die App wird bereit gestellt von <a href=\"https://www.ondics.de/\">Ondics GmbH</a>.",
-    "",
-    "## Open Data App Store",
-    "Der Open Data App Store betrieben von <a href=\"https://www.ondics.de/\">Ondics GmbH</a>"
+    "<p>Die Realtime Data View-App visualisiert Zeitreihen und Messdaten aus offenen Datenquellen.</p>",
+    "<p>Sie stellt Werte in auswählbaren Diagrammtypen dar und unterstützt den schnellen Blick auf aktuelle Entwicklungen.</p>",
+    "<h3>Inhalte</h3>",
+    "<p>Die App verarbeitet CSV-Daten mit Zeitstempel, Messwerten und optionalen Kategorien. Linien-, Balken- oder Flächendiagramme helfen, Trends und Veränderungen zu erkennen.</p>",
+    "<h3>Nutzung</h3>",
+    "<p>Wählen Sie die gewünschte Visualisierung, betrachten Sie den Verlauf und grenzen Sie bei Bedarf die angezeigten Daten ein. Die App zeigt die gelieferten Daten der Quelle und ergänzt keine fachliche Bewertung.</p>",
+    "<h3>Für wen ist diese App?</h3>",
+    "<p>Die App richtet sich an Bürger:innen, Fachstellen, Verwaltung und Betreiber offener Sensordaten, die Messreihen verständlich darstellen möchten. Besondere Datenkenntnisse sind für die Nutzung nicht erforderlich.</p>",
+    "<h3>Datenquelle</h3>",
+    "<p>Die Daten werden aus der konfigurierten CSV-Ressource geladen und im Browser visualisiert.</p>",
+    "<ul><li><strong>Open Data Portal:</strong> <a href=\"https://open-data-musterstadt.ckan.de\" target=\"_blank\" rel=\"noopener\">Open Data Musterstadt</a></li><li><strong>Datensatz:</strong> <a href=\"https://open-data-musterstadt.ckan.de/dataset/verlaufstestdaten\" target=\"_blank\" rel=\"noopener\">Verlaufstestdaten</a></li><li><strong>Ressource:</strong> <a href=\"https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv\" target=\"_blank\" rel=\"noopener\">CSV-Ressource</a></li></ul>",
+    "<h3>Open Data App Store</h3>",
+    "<p>Diese App ist für den Open Data App Store vorbereitet und kann mit kommunalen Echtzeit-, Sensor- oder Verlaufdaten konfiguriert werden.</p>"
   ],
   "kontakt": [
     "Tel.: <a href='tel:+49711310093100'>0711-31009-3100</a><br>",
@@ -46,36 +44,9 @@
   "sprache": "de",
   "chartType": "Aggregate Bar Chart",
   "weiterfuehrendeLinks": "<ul><li><a href=\"https://open-data-musterstadt.ckan.de/dataset/verlaufstestdaten\" target=\"_blank\">CKAN-Datensatz „Verlaufstestdaten\"</a></li><li><a href=\"https://www.umweltbundesamt.de/themen/wasser/fluesse/pegel\" target=\"_blank\">Umweltbundesamt – Pegelmesstechnik</a></li></ul>",
-  "datenquelleHinweis": "CSV-Parsing mit Kategorie-Gruppierung (category-Feld), 10s-Auto-Refresh (setInterval), CKAN-Metadaten-Integration (\\`resource_show\\`/\\`package_show\\` über Proxy), Vega-Lite Visualisierung mit 15+ Chart-Typen.",
-  "kpiKontext1": {
-    "label": "KPI Kontext 1",
-    "hilfe": "Erklärungstext für KPI-Kachel 1",
-    "format": {
-      "typ": "string",
-      "laenge": 250
-    },
-    "default": "",
-    "erforderlich": "nein"
-  },
-  "kpiKontext2": {
-    "label": "KPI Kontext 2",
-    "hilfe": "Erklärungstext für KPI-Kachel 2",
-    "format": {
-      "typ": "string",
-      "laenge": 250
-    },
-    "default": "",
-    "erforderlich": "nein"
-  },
-  "kpiKontext3": {
-    "label": "KPI Kontext 3",
-    "hilfe": "Erklärungstext für KPI-Kachel 3",
-    "format": {
-      "typ": "string",
-      "laenge": 250
-    },
-    "default": "",
-    "erforderlich": "nein"
-  },
-  "datenStand": ""
+  "datenquelleHinweis": "<p>Die Sensordaten werden als CSV-Datei geladen und mit Kategorie-Gruppierung angezeigt. Die App visualisiert die gelieferten Zeitreihen im Browser; Messausfälle, Lücken oder verspätete Aktualisierungen können nur so gut dargestellt werden, wie sie in der Quelle enthalten sind.</p>",
+  "kpiKontext1": "Anzahl der geladenen Messwerte aus der Datenquelle. Zeigt den Umfang des analysierten Zeitreihen-Datensatzes.",
+  "kpiKontext2": "Anzahl der verschiedenen Kategorien im Datensatz. Zeigt, wie viele unterschiedliche Messgrößen oder Gruppen erfasst wurden.",
+  "kpiKontext3": "Der aktuellste Messwert aus der Zeitreihe mit Einheit. Zeigt den neuesten verfügbaren Datenstand der Quelle.",
+  "datenStand": "Stand: Live-Abruf aus der konfigurierten CSV-Ressource"
 }
