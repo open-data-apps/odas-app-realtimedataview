@@ -3,20 +3,27 @@
   "app-entwickler-name": "ondics-gmbh",
   "name-in-url": "realtime-data-view",
   "name": "Realtime Data View",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
   "kurzbeschreibung": "Diese Open Data App ist zur Visualisierung von Realtime Data.",
   "beschreibung": [
     "_multiline_",
-    "Die Open Data App ist zur Visualisierung von Realtime Data. ",
-    "Die Daten werden aus einem Open Data Portal bezogen. ",
-    "Die App kann für Echt-/Sensordatenazeige genutzt werden.",
-    "Erforderliche Spalten:",
-    "date: ISO-Datum im Format YYYY-MM-DDTHH:mm:ssZ (String)",
-    "value: numerischer Wert (Zahl)",
-    "Optionale Spalten:",
-    "category: Gruppierungsmerkmal (String)"
+    "Die Realtime Data View-App visualisiert Echtzeit-Sensordaten aus offenen Datenportalen.",
+    "Die Daten werden als CSV-Dateien geladen und in auswählbaren Diagrammtypen wie Linien-, Balken- oder Flächendiagrammen dargestellt.",
+    "",
+    "## Für wen ist diese App?",
+    "Diese App zeigt Echtzeit-Sensordaten wie Pegelstände, Verkehrszahlen oder Wetterdaten. Sie richtet sich an Bürger:innen und Fachleute, die aktuelle Messwerte im Blick behalten möchten.",
+    "",
+    "## Datenquelle",
+    "Die Daten kommen aus unserem Open Data Portal <a href=\"{{odp.url}}\">{{odp.name}}</a>",
+    "Die Datenquelle ist in unserem Open Data Portal <a href=\"{{appinstanz.apiurl}}\">{{appinstanz.apiurl}}</a>.",
+    "",
+    "## App-Anbieter",
+    "Die App wird bereit gestellt von <a href=\"{{odp.anbieter.url}}\">{{odp.anbieter.name}}</a>.",
+    "",
+    "## Open Data App Store",
+    "Der Open Data App Store betrieben von <a href=\"{{odas.betreiber.url}}\">{{odas.betreiber.name}}</a>"
   ],
   "tags-funktion": [
     "Visualisierung"
@@ -239,6 +246,15 @@
         "default": "de"
       },
       "erforderlich": "ja"
+    },
+    "weiterfuehrendeLinks": {
+      "label": "Weiterführende Links",
+      "hilfe": "Verwandte Datensätze / Hintergrundquellen (HTML/Markdown). Leer = ausgeblendet.",
+      "format": {
+        "typ": "markdown"
+      },
+      "default": "<ul><li><a href=\"https://open-data-musterstadt.ckan.de/dataset/verlaufstestdaten\" target=\"_blank\">CKAN-Datensatz „Verlaufstestdaten\"</a></li><li><a href=\"https://www.umweltbundesamt.de/themen/wasser/fluesse/pegel\" target=\"_blank\">Umweltbundesamt – Pegelmesstechnik</a></li></ul>",
+      "erforderlich": "nein"
     }
   },
   "daten": {

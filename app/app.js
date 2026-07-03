@@ -157,12 +157,24 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       rowAndChartContainer = document.createElement("div");
       rowAndChartContainer.className = "w-100 d-flex flex-column gap-1";
       rowAndChartContainer.appendChild(flexRow);
+      
+      var kpiRow = document.createElement("div");
+      kpiRow.id = "rt-kpi-row";
+      kpiRow.className = "row g-3 mb-3";
+      rowAndChartContainer.appendChild(kpiRow);
       rowAndChartContainer.appendChild(chartDiv);
 
       contentContainer = document.createElement("div");
       contentContainer.className =
         "d-flex flex-column flex-grow-1 w-100 h-100 gap-3 startseite-content";
       contentContainer.appendChild(rowAndChartContainer);
+
+      var weitereDiv = document.createElement("div");
+      weitereDiv.innerHTML = renderWeitereInfos(configdata);
+      if (weitereDiv.innerHTML) contentContainer.appendChild(weitereDiv);
+      var methodikDiv = document.createElement("div");
+      methodikDiv.innerHTML = renderMethodikbox(configdata);
+      if (methodikDiv.innerHTML) contentContainer.appendChild(methodikDiv);
 
       enclosingHtmlDivElement.appendChild(contentContainer);
     }
@@ -193,7 +205,19 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       <span class='fw-bold ms-2'> Datum des Wertes:</span>
       <span>${lastMod}</span>
       ${spinnerHtml}
+      <br><small id="rt-datenladung" class="text-muted"></small>
     `;
+
+    var totalRecords = data.length;
+    var categories = [...new Set(data.filter(function(d) { return d.category; }).map(function(d) { return d.category; }))].length;
+    var latestVal = latestValue;
+    
+    var kpiRowEl = document.getElementById("rt-kpi-row");
+    if (kpiRowEl) {
+      kpiRowEl.innerHTML = '<div class="col-6 col-md-4"><div class="card border-primary h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-primary">' + totalRecords + '</div><div class="text-muted small">Datenpunkte</div>' + kpiContext(configdata.kpiKontext1, "1") + '</div></div></div>' +
+        '<div class="col-6 col-md-4"><div class="card border-info h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-info">' + categories + '</div><div class="text-muted small">Kategorien</div>' + kpiContext(configdata.kpiKontext2, "2") + '</div></div></div>' +
+        '<div class="col-6 col-md-4"><div class="card border-success h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-success">' + latestVal + '</div><div class="text-muted small">Aktueller Wert</div>' + kpiContext(configdata.kpiKontext3, "3") + '</div></div></div>';
+    }
 
     // Chart rendern
     const specs = {
@@ -465,6 +489,10 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
         lastMod = new Date().toLocaleString("de-DE");
       }
       await renderContent(data, lastMod);
+
+      var nowStr = new Date().toLocaleString("de-DE");
+      var badge = document.getElementById("rt-datenladung");
+      if (badge) badge.textContent = "Letzte Datenladung: " + nowStr;
     } catch (err) {
       const alert = document.createElement("div");
       alert.className = "alert alert-danger text-center";
@@ -498,6 +526,72 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
   };
 
   return null; // explizit null zurückgeben, kein Promise
+}
+
+/* ── Schale 4: escapeHtml ── */
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/* ── Schale 4: Weiterführende Links ── */
+
+  /* ── Schale 4: KPI Kontext ── */
+  function kpiContext(kontext, id) {
+    var text = String(kontext || "").trim();
+    if (!text) return "";
+    var targetId = "rt-kpi-kontext-" + id;
+    return (
+      '<button class="rt-kpi-info-toggle collapsed" type="button" ' +
+      'data-bs-toggle="collapse" data-bs-target="#' + targetId + '" ' +
+      'aria-expanded="false" aria-controls="' + targetId + '" ' +
+      'aria-label="Erklärung zu diesem Wert">' +
+      '<span class="rt-kpi-info-icon" aria-hidden="true">ⓘ</span>' +
+      "</button>" +
+      '<div id="' + targetId + '" class="collapse">' +
+      '<div class="rt-kpi-kontext">' + escapeHtml(text) + "</div>" +
+      "</div>"
+    );
+  }
+
+  /* ── Schale 4: Methodikbox ── */
+  function renderMethodikbox(cfg) {
+    var hinweis = ((cfg && cfg.datenquelleHinweis) || "").trim();
+    var stand = ((cfg && cfg.datenStand) || "").trim();
+    if (!hinweis && !stand) return "";
+    var standHtml = stand
+      ? '<p class="text-muted small mb-2">' + escapeHtml(stand) + "</p>"
+      : "";
+    return (
+      '<section class="rt-methodik mt-3">' +
+      '<button class="rt-methodik-toggle collapsed" type="button" ' +
+      'data-bs-toggle="collapse" data-bs-target="#rt-methodik-body" ' +
+      'aria-expanded="false" aria-controls="rt-methodik-body">' +
+      '<h2 class="h5 mb-0">Methodik &amp; Datenquelle</h2>' +
+      '<span class="rt-methodik-chevron" aria-hidden="true">&#9662;</span>' +
+      "</button>" +
+      '<div id="rt-methodik-body" class="collapse">' +
+      '<div class="rt-methodik-content">' +
+      standHtml +
+      hinweis +
+      "</div></div></section>"
+    );
+  }
+
+function renderWeitereInfos(cfg) {
+  var links = ((cfg && cfg.weiterfuehrendeLinks) || "").trim();
+  if (!links) return "";
+  return (
+    '<section class="rt-weitere-infos mt-3">' +
+    '<h2 class="h5 mb-2">Weitere Informationen</h2>' +
+    '<div class="rt-weitere-infos-content">' +
+    links +
+    "</div></section>"
+  );
 }
 
 /*

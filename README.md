@@ -27,3 +27,7 @@ Die APP zeigt Ihre Konfiguration im CSV Format an.
 ## Autor
 
 (C) 2025, Ondics GmbH
+
+## Für wen ist diese App?
+
+Diese App zeigt Echtzeit-Sensordaten wie Pegelstände, Verkehrszahlen oder Wetterdaten. Sie richtet sich an Bürger:innen und Fachleute, die aktuelle Messwerte im Blick behalten möchten.
