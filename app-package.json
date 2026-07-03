@@ -255,6 +255,55 @@
       },
       "default": "<ul><li><a href=\"https://open-data-musterstadt.ckan.de/dataset/verlaufstestdaten\" target=\"_blank\">CKAN-Datensatz „Verlaufstestdaten\"</a></li><li><a href=\"https://www.umweltbundesamt.de/themen/wasser/fluesse/pegel\" target=\"_blank\">Umweltbundesamt – Pegelmesstechnik</a></li></ul>",
       "erforderlich": "nein"
+    },
+    "datenquelleHinweis": {
+      "label": "Methodik / Datenquelle-Hinweis",
+      "hilfe": "Herkunft, Erhebungsmethode und Limitierungen (HTML/Markdown). Leer = ausgeblendet.",
+      "format": {
+        "typ": "markdown"
+      },
+      "default": "<p>Die Sensordaten werden als CSV-Datei geladen und mit Kategorie-Gruppierung angezeigt. Die App aktualisiert die Daten automatisch alle 10 Sekunden. Zusätzliche Metadaten (Titel, Beschreibung) werden aus der CKAN resource_show/package_show API geladen. Die Proxy-URL wird mit mehreren Fallback-Kandidaten aufgelöst.</p>",
+      "erforderlich": "nein"
+    },
+    "datenStand": {
+      "label": "Datenstand",
+      "hilfe": "Freitext-Hinweis zum Stand der Daten. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string",
+        "laenge": 60
+      },
+      "default": "",
+      "erforderlich": "nein"
+    },
+    "kpiKontext1": {
+      "label": "KPI-Erklärung 1: Datenpunkte",
+      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string",
+        "laenge": 250
+      },
+      "default": "",
+      "erforderlich": "nein"
+    },
+    "kpiKontext2": {
+      "label": "KPI-Erklärung 2: Aktueller Wert",
+      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string",
+        "laenge": 250
+      },
+      "default": "",
+      "erforderlich": "nein"
+    },
+    "kpiKontext3": {
+      "label": "KPI-Erklärung 3: Datum des Wertes",
+      "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
+      "format": {
+        "typ": "string",
+        "laenge": 250
+      },
+      "default": "",
+      "erforderlich": "nein"
     }
   },
   "daten": {
