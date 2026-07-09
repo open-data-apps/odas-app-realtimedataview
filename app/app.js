@@ -14,15 +14,16 @@ function extractPathFromUrl(url) {
 }
 
 async function app(configdata = {}, enclosingHtmlDivElement) {
-  // Bootstrap-Container und Flex
-  enclosingHtmlDivElement.className =
-    "container-xxl d-flex flex-column justify-content-center align-items-center p-0";
   enclosingHtmlDivElement.innerHTML = "";
+  const startseiteContainer = document.createElement("div");
+  startseiteContainer.className =
+    "container-xxl d-flex flex-column justify-content-center align-items-center p-0 startseite-content";
+  enclosingHtmlDivElement.appendChild(startseiteContainer);
 
   // Info-Box
   const infoBox = document.createElement("div");
   infoBox.className = "mb-4 text-center";
-  enclosingHtmlDivElement.appendChild(infoBox);
+  startseiteContainer.appendChild(infoBox);
 
   // --- Metadaten laden über Proxy ---
   let resourceTitle = "";
@@ -113,7 +114,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       </a>
     </div>
   `;
-  enclosingHtmlDivElement.appendChild(metaHeader);
+  startseiteContainer.appendChild(metaHeader);
 
   // Spinner-Element für das Laden (wird in infoRight platziert)
   const spinnerHtml = `
@@ -176,7 +177,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       methodikDiv.innerHTML = renderMethodikbox(configdata);
       if (methodikDiv.innerHTML) contentContainer.appendChild(methodikDiv);
 
-      enclosingHtmlDivElement.appendChild(contentContainer);
+      startseiteContainer.appendChild(contentContainer);
     }
 
     // Aktualisiere nur die Inhalte
@@ -450,7 +451,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     let spinnerElem;
     // Suche nach dem Spinner im aktuellen infoRight (kann sich bei jedem Render ändern)
     const findSpinner = () => {
-      return enclosingHtmlDivElement.querySelector("#data-spinner");
+      return startseiteContainer.querySelector("#data-spinner");
     };
     spinnerElem = findSpinner();
     if (spinnerElem) spinnerElem.style.display = "inline-block";
@@ -497,7 +498,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       const alert = document.createElement("div");
       alert.className = "alert alert-danger text-center";
       alert.textContent = `Fehler: ${err.message}`;
-      enclosingHtmlDivElement.appendChild(alert);
+      startseiteContainer.appendChild(alert);
       console.error(err);
     } finally {
       // Spinner sofort ausblenden
