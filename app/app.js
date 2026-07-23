@@ -4,13 +4,82 @@
 - @param {HTMLElement} enclosingHtmlDivElement - Container für den Content
 - @returns {null}
 */
+function isOdasProxyEnabled(configdata = {}) {
+  return String(configdata.proxyAktiv || "").trim().toLowerCase() === "ja";
+}
+
 function extractPathFromUrl(url) {
   try {
-    const u = new URL(url);
-    return u.pathname + u.search;
-  } catch (e) {
-    return url;
+    const parsedUrl = new URL(url);
+    return parsedUrl.pathname + parsedUrl.search;
+  } catch (_error) {
+    return String(url || "");
   }
+}
+
+function getOdasAppBasePath(pathname) {
+  let appPath =
+    pathname === undefined
+      ? typeof window !== "undefined"
+        ? window.location.pathname
+        : "/"
+      : String(pathname || "/");
+
+  if (!appPath.endsWith("/")) {
+    const lastSlashIndex = appPath.lastIndexOf("/");
+    const lastSegment = appPath.substring(lastSlashIndex + 1);
+    if (lastSegment.includes(".")) {
+      appPath = appPath.substring(0, lastSlashIndex + 1);
+    }
+  }
+
+  return appPath.replace(/\/+$/, "");
+}
+
+function getOdasProxyEndpoint(targetUrl, pathname) {
+  const appPath = getOdasAppBasePath(pathname);
+  return `${appPath}/odp-data?path=${encodeURIComponent(
+    extractPathFromUrl(targetUrl),
+  )}`;
+}
+
+async function fetchViaOdasProxy(targetUrl) {
+  const response = await fetch(getOdasProxyEndpoint(targetUrl), {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error(`ODAS-Proxy-Fehler: HTTP ${response.status}`);
+  }
+
+  const proxyData = await response.json();
+  if (!proxyData || typeof proxyData.content !== "string") {
+    throw new Error("ODAS-Proxy-Antwort enthält keinen content-String.");
+  }
+
+  return proxyData.content;
+}
+
+async function fetchOdasResource(targetUrl, configdata = {}) {
+  if (isOdasProxyEnabled(configdata)) {
+    return fetchViaOdasProxy(targetUrl);
+  }
+
+  try {
+    const response = await fetch(targetUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.text();
+  } catch (error) {
+    throw new Error(
+      `Direkter Datenabruf fehlgeschlagen (${error.message}). Bitte prüfen Sie die Daten-URL und die CORS-Freigabe der Datenquelle.`,
+    );
+  }
+}
+
+async function fetchOdasJson(targetUrl, configdata = {}) {
+  return JSON.parse(await fetchOdasResource(targetUrl, configdata));
 }
 
 async function app(configdata = {}, enclosingHtmlDivElement) {
@@ -51,40 +120,30 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       if (match) datasetId = match[1];
     }
 
-    // CKAN API Endpunkt über Proxy
-    const fullPath = window.location.pathname.replace(/\/+$/, "");
+    // CKAN-API-Basis aus der konfigurierten Daten-URL ableiten
+    const ckanOrigin = new URL(configdata.apiurl).origin;
 
-    // Hole Resource-Metadaten über Proxy
+    // Hole Resource-Metadaten (direkt oder ueber den ODAS-Proxy)
     if (resourceId) {
-      const resApiUrl = `/api/3/action/resource_show?id=${resourceId}`;
-      const resProxyEndpoint = `${fullPath}/odp-data?path=${resApiUrl}`;
+      const resApiUrl = `${ckanOrigin}/api/3/action/resource_show?id=${resourceId}`;
       try {
-        const resMeta = await fetch(resProxyEndpoint, { method: "POST" });
-        if (resMeta.ok) {
-          const resProxyData = await resMeta.json();
-          const resJson = JSON.parse(resProxyData.content);
-          if (resJson.success && resJson.result) {
-            resourceTitle = resJson.result.name || resJson.result.title || "";
-            resourceDescription = resJson.result.description || "";
-          }
+        const resJson = await fetchOdasJson(resApiUrl, configdata);
+        if (resJson.success && resJson.result) {
+          resourceTitle = resJson.result.name || resJson.result.title || "";
+          resourceDescription = resJson.result.description || "";
         }
       } catch (e) {
         console.warn("Fehler beim Laden der Resource-Metadaten:", e);
       }
     }
 
-    // Hole Dataset-Metadaten über Proxy
+    // Hole Dataset-Metadaten (direkt oder ueber den ODAS-Proxy)
     if (datasetId) {
-      const dsApiUrl = `/api/3/action/package_show?id=${datasetId}`;
-      const dsProxyEndpoint = `${fullPath}/odp-data?path=${dsApiUrl}`;
+      const dsApiUrl = `${ckanOrigin}/api/3/action/package_show?id=${datasetId}`;
       try {
-        const dsMeta = await fetch(dsProxyEndpoint, { method: "POST" });
-        if (dsMeta.ok) {
-          const dsProxyData = await dsMeta.json();
-          const dsJson = JSON.parse(dsProxyData.content);
-          if (dsJson.success && dsJson.result) {
-            datasetTitle = dsJson.result.title || "";
-          }
+        const dsJson = await fetchOdasJson(dsApiUrl, configdata);
+        if (dsJson.success && dsJson.result) {
+          datasetTitle = dsJson.result.title || "";
         }
       } catch (e) {
         console.warn("Fehler beim Laden der Dataset-Metadaten:", e);
@@ -410,6 +469,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     const spec = specFn(data);
     spec.width = "container";
     spec.height = 400;
+    await loadVega();
     await vegaEmbed("#vega-chart", spec, {
       mode: "vega-lite",
       renderer: "canvas",
@@ -457,17 +517,8 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     if (spinnerElem) spinnerElem.style.display = "inline-block";
 
     try {
-      // CSV-Daten über Proxy laden
-      const fullPath = window.location.pathname.replace(/\/+$/, "");
-      const proxyEndpoint = `${fullPath}/odp-data?path=${extractPathFromUrl(
-        configdata.apiurl
-      )}`;
-      const res = await fetch(proxyEndpoint, { method: "POST" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const proxyData = await res.json();
-      // CSV-Daten verarbeiten
-      const csvText = proxyData.content;
+      // CSV-Daten laden: direkt oder ueber den ODAS-Proxy (proxyAktiv)
+      const csvText = await fetchOdasResource(configdata.apiurl, configdata);
       let data = parseCSV(csvText);
 
       // Datenpunkt-Limit anwenden
@@ -596,18 +647,52 @@ function renderWeitereInfos(cfg) {
 }
 
 /*
-- Lädt Vega, Vega-Lite und Vega-Embed ins <head>
+- Laedt Vega, Vega-Lite und Vega-Embed nacheinander und meldet erst dann fertig.
+- Die Skripte haengen voneinander ab und muessen in dieser Reihenfolge geladen werden.
 */
-function addToHead() {
-  [
+let vegaLoadPromise = null;
+
+function loadScriptOnce(src) {
+  return new Promise((resolve, reject) => {
+    const vorhanden = document.querySelector(`script[src="${src}"]`);
+    if (vorhanden) {
+      if (vorhanden.dataset.geladen === "ja") return resolve();
+      vorhanden.addEventListener("load", () => resolve());
+      vorhanden.addEventListener("error", () =>
+        reject(new Error(`Skript konnte nicht geladen werden: ${src}`)),
+      );
+      return;
+    }
+    const el = document.createElement("script");
+    el.src = src;
+    el.async = false;
+    el.crossOrigin = "anonymous";
+    el.onload = () => {
+      el.dataset.geladen = "ja";
+      resolve();
+    };
+    el.onerror = () =>
+      reject(new Error(`Skript konnte nicht geladen werden: ${src}`));
+    document.head.appendChild(el);
+  });
+}
+
+function loadVega() {
+  if (typeof vegaEmbed !== "undefined") return Promise.resolve();
+  if (vegaLoadPromise) return vegaLoadPromise;
+
+  vegaLoadPromise = [
     "https://cdn.jsdelivr.net/npm/vega@5/build/vega.min.js",
     "https://cdn.jsdelivr.net/npm/vega-lite@5/build/vega-lite.min.js",
     "https://cdn.jsdelivr.net/npm/vega-embed@6/build/vega-embed.min.js",
-  ].forEach((src) => {
-    const s = document.createElement("script");
-    s.src = src;
-    s.async = false;
-    s.crossOrigin = "anonymous";
-    document.head.appendChild(s);
-  });
+  ].reduce(
+    (kette, src) => kette.then(() => loadScriptOnce(src)),
+    Promise.resolve(),
+  );
+  return vegaLoadPromise;
 }
+
+/*
+- Vega wird bei Bedarf über loadVega() geladen, nicht mehr hier.
+*/
+function addToHead() {}
