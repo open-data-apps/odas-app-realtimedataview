@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0 - 2026-07-24
+
+- **FIX:** Laufzeit-Fehlermeldung wird vor der Anzeige HTML-maskiert (`escapeHtmlForBase`); ein Fehlertext kann kein Markup mehr in die Seite einschleusen (XSS)
+
 ## 1.3.0 - 2026-07-23
 
 - **ENH:** Datenabruf auf den Schalter `proxyAktiv` umgestellt; direkte Abrufe sind der Standard, der ODAS-Proxy wird nur noch bei `ja` verwendet
