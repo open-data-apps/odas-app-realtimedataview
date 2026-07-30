@@ -1,3 +1,13 @@
+/*
+ * Diese App führt ihre Überschrift im Inhaltsbereich und blendet die Kopfzeilen-
+ * Überschrift des Templates aus. Bisher wurde dafür in app/app-base.js der Wert von
+ * `titel` auf einen leeren String überschrieben — eine App-Anpassung in einer
+ * template-eigenen Datei. Die Ausblendung gehört hierher.
+ */
+#title-text {
+  display: none;
+}
+
 /* Nur für die Startseite: Chart Container und Canvas Styling */
 #main-content .startseite-content #vega-chart {
   width: 100% !important;

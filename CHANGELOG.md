@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0 - 2026-07-30
+
+- **FIX:** Laufzeitfehler nach dem Laden der Konfiguration werden jetzt sichtbar gemeldet; `handleRouting()` wird `await`et und besitzt einen Fehlerpfad
+- **FIX:** `getConfigUrl()` schneidet bei einer URL ohne abschliessenden Schraegstrich nicht mehr das letzte Verzeichnis ab
+- **FIX:** Klick auf einen Hash-Link, der bereits die aktive Seite bezeichnet, rendert die Seite neu (`setupSamePageLinks()`)
+- **ENH:** `app/app-base.js` ist wieder byte-identisch zum Template `oda-generic` 1.4.0. Das Stoppen des 10-Sekunden-Pollings laeuft ueber den neuen Hook `onPageLeave(page)` in `app/app.js`
+- **ENH:** Die Kopfzeilen-Ueberschrift wird jetzt per CSS in `app/app.css` ausgeblendet statt durch Ueberschreiben des Konfigurationswerts `titel` in der Template-Datei
+
 ## 1.4.0 - 2026-07-24
 
 - **FIX:** Laufzeit-Fehlermeldung wird vor der Anzeige HTML-maskiert (`escapeHtmlForBase`); ein Fehlertext kann kein Markup mehr in die Seite einschleusen (XSS)

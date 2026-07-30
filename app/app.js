@@ -4,6 +4,19 @@
 - @param {HTMLElement} enclosingHtmlDivElement - Container für den Content
 - @returns {null}
 */
+/*
+ * Template-Hook (oda-generic 1.4.0). Die Base ruft ihn vor dem Rendern der neuen Seite
+ * auf. app() registriert beim Aufbau der Startseite `window.clearStartseiteInterval`, um
+ * sein 10-Sekunden-Polling wieder stoppen zu koennen; ohne diesen Aufruf liefe es auf den
+ * Unterseiten weiter. Frueher rief app/app-base.js die Funktion selbst auf und wich
+ * dadurch vom Template ab.
+ */
+function onPageLeave(page) {
+  if (typeof window.clearStartseiteInterval === "function") {
+    window.clearStartseiteInterval();
+  }
+}
+
 function isOdasProxyEnabled(configdata = {}) {
   return String(configdata.proxyAktiv || "").trim().toLowerCase() === "ja";
 }
