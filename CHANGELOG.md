@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.0 - 2026-07-31
+- FIX: CSV-Zerlegung auf den Konventions-Parser umgestellt (F-14) - Semikolon-Quellen,
+  gequotete Felder und CRLF-Zeilenenden werden korrekt gelesen
+- FIX: Nicht lesbare Messwerte wandern nicht mehr als 0 in die Reihe, sondern werden
+  gezaehlt und als Hinweis angezeigt
+- ENH: Dezimalkomma in Messwerten wird unterstuetzt
+- ENH: Empty-State "Keine Daten gefunden." ergaenzt
+
 ## 1.7.0 - 2026-07-31
 - CHG: fehlendes Pflicht-Asset assets/branding.css ergaenzt und brandingCSSFile lokal aktiviert
 

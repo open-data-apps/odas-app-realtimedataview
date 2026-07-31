@@ -91,6 +91,63 @@ async function fetchOdasResource(targetUrl, configdata = {}) {
   }
 }
 
+// ── CSV-PARSING ──────────────────────────────────────────────────────────────
+// Kommunale Open-Data-CSVs sind häufig Semikolon-getrennt, enthalten gequotete
+// Felder und CRLF-Zeilenenden. Naives split(",") verwirft solche Zeilen still.
+
+function detectCsvDelimiter(text) {
+  const firstLine = String(text).split(/\r\n|\r|\n/)[0] || "";
+  let best = ",";
+  let bestCount = 0;
+  [";", ",", "\t", "|"].forEach((cand) => {
+    let count = 0;
+    let inQuotes = false;
+    for (let i = 0; i < firstLine.length; i++) {
+      const c = firstLine[i];
+      if (c === '"') inQuotes = !inQuotes;
+      else if (c === cand && !inQuotes) count++;
+    }
+    if (count > bestCount) {
+      bestCount = count;
+      best = cand;
+    }
+  });
+  return best;
+}
+
+function parseCsv(text, delimiter) {
+  const sep = delimiter || detectCsvDelimiter(text);
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"' && text[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else if (c === '"') inQuotes = false;
+      else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === sep) {
+      row.push(field);
+      field = "";
+    } else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field);
+      field = "";
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== "" || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
+  return rows;
+}
+
 async function fetchOdasJson(targetUrl, configdata = {}) {
   return JSON.parse(await fetchOdasResource(targetUrl, configdata));
 }
@@ -491,31 +548,36 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
   }
 
   // --- CSV Parser Funktion ---
+  // Liefert { rows, verworfen } — Zeilen ohne verwertbaren Messwert werden
+  // gezählt statt stillschweigend als 0 in die Reihe zu wandern.
   function parseCSV(csvText) {
-    const lines = csvText.trim().split("\n");
-    if (lines.length < 2) return [];
+    const parsed = parseCsv(csvText);
+    if (parsed.length < 2) return { rows: [], verworfen: 0 };
 
-    const headers = lines[0].split(",").map((h) => h.trim());
-    const data = [];
+    const headers = parsed[0].map((h) => h.trim());
+    const rows = [];
+    let verworfen = 0;
 
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(",").map((v) => v.trim());
+    parsed.slice(1).forEach((values) => {
       const row = {};
-
       headers.forEach((header, index) => {
-        if (header === "date") {
-          row[header] = values[index];
-        } else if (header === "value") {
-          row[header] = parseFloat(values[index]) || 0;
+        const raw = (values[index] || "").trim();
+        if (header === "value") {
+          const num = parseFloat(raw.replace(",", "."));
+          row[header] = Number.isFinite(num) ? num : null;
         } else {
-          row[header] = values[index];
+          row[header] = raw;
         }
       });
+      // Eine Zeile ohne Datum oder ohne lesbaren Messwert ist kein Datenpunkt.
+      if (!row.date || row.value === null || row.value === undefined) {
+        verworfen++;
+        return;
+      }
+      rows.push(row);
+    });
 
-      data.push(row);
-    }
-
-    return data;
+    return { rows, verworfen };
   }
 
   // Funktion zum Laden der Daten und Aktualisieren der Anzeige (über Proxy)
@@ -532,7 +594,14 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     try {
       // CSV-Daten laden: direkt oder ueber den ODAS-Proxy (proxyAktiv)
       const csvText = await fetchOdasResource(configdata.apiurl, configdata);
-      let data = parseCSV(csvText);
+      const { rows: geparst, verworfen } = parseCSV(csvText);
+      let data = geparst;
+
+      if (verworfen > 0) {
+        console.warn(
+          `Realtimedataview: ${verworfen} Zeile(n) ohne verwertbaren Messwert übersprungen.`,
+        );
+      }
 
       // Datenpunkt-Limit anwenden
       const datenpunktlimit = parseInt(configdata.datenpunktlimit) || 9999; // Default: 9999 Punkte
@@ -554,6 +623,22 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
         lastMod = new Date().toLocaleString("de-DE");
       }
       await renderContent(data, lastMod);
+
+      if (data.length === 0) {
+        const leer = document.createElement("div");
+        leer.className = "alert alert-info text-center";
+        leer.setAttribute("role", "alert");
+        leer.textContent = "Keine Daten gefunden.";
+        startseiteContainer.appendChild(leer);
+      } else if (verworfen > 0) {
+        const hinweis = document.createElement("div");
+        hinweis.className = "alert alert-warning text-center";
+        hinweis.setAttribute("role", "alert");
+        hinweis.textContent =
+          `${verworfen} Datenpunkt(e) der Datenquelle konnten nicht gelesen ` +
+          "werden und fehlen in dieser Darstellung.";
+        startseiteContainer.appendChild(hinweis);
+      }
 
       var nowStr = new Date().toLocaleString("de-DE");
       var badge = document.getElementById("rt-datenladung");
