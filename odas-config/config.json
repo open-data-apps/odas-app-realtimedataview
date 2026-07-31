@@ -49,5 +49,6 @@
   "kpiKontext1": "Anzahl der geladenen Messwerte aus der Datenquelle. Zeigt den Umfang des analysierten Zeitreihen-Datensatzes.",
   "kpiKontext2": "Anzahl der verschiedenen Kategorien im Datensatz. Zeigt, wie viele unterschiedliche Messgrößen oder Gruppen erfasst wurden.",
   "kpiKontext3": "Der aktuellste Messwert aus der Zeitreihe mit Einheit. Zeigt den neuesten verfügbaren Datenstand der Quelle.",
-  "datenStand": "Stand: Live-Abruf aus der konfigurierten CSV-Ressource"
+  "datenStand": "Stand: Live-Abruf aus der konfigurierten CSV-Ressource",
+  "brandingCSSFile": ""
 }

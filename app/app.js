@@ -171,18 +171,18 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
   const metaHeader = document.createElement("div");
   metaHeader.className = "mb-4 w-100 text-center";
   metaHeader.innerHTML = `
-    <h2 class="fw-bold">${resourceTitle || "Ressourcen-Titel"}</h2>
-    <div class="mb-2">${resourceDescription || ""}</div>
+    <h2 class="fw-bold">${escapeHtml(resourceTitle || "Ressourcen-Titel")}</h2>
+    <div class="mb-2">${escapeHtml(resourceDescription || "")}</div>
     <div class="mb-1">
       <span class="fw-bold">Datenbeschreibung (Open Data):</span>
-      <a href="${configdata.urlDaten || "#"}" target="_blank" rel="noopener">
-        ${datasetTitle || "Datensatz"}
+      <a href="${escapeHtml(safeUrl(configdata.urlDaten) || "#")}" target="_blank" rel="noopener">
+        ${escapeHtml(datasetTitle || "Datensatz")}
       </a>
     </div>
     <div class="mb-3">
       <span class="fw-bold">Daten (Open Data):</span>
-      <a href="${configdata.apiurl || "#"}" target="_blank" rel="noopener">
-        ${resourceTitle || "Ressourcen-Titel"}
+      <a href="${escapeHtml(safeUrl(configdata.apiurl) || "#")}" target="_blank" rel="noopener">
+        ${escapeHtml(resourceTitle || "Ressourcen-Titel")}
       </a>
     </div>
   `;
@@ -260,7 +260,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     infoLeft.innerHTML = `
       <span class='fw-bold'>Anzeige:</span>
       <span>${isLimited ? "Letzte " : ""}${data.length} Datenpunkte${
-      isLimited ? ` (Limit: ${datenpunktlimit})` : ""
+      isLimited ? ` (Limit: ${escapeHtml(datenpunktlimit)})` : ""
     }</span>
     `;
 
@@ -274,9 +274,9 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
 
     infoRight.innerHTML = `
       <span class='fw-bold'>Aktueller Wert:</span>
-      <span>${latestValue}${dateneinheit}</span>
+      <span>${escapeHtml(latestValue)}${escapeHtml(dateneinheit)}</span>
       <span class='fw-bold ms-2'> Datum des Wertes:</span>
-      <span>${lastMod}</span>
+      <span>${escapeHtml(lastMod)}</span>
       ${spinnerHtml}
       <br><small id="rt-datenladung" class="text-muted"></small>
     `;
@@ -289,7 +289,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     if (kpiRowEl) {
       kpiRowEl.innerHTML = '<div class="col-6 col-md-4"><div class="card border-primary h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-primary">' + totalRecords + '</div><div class="text-muted small">Datenpunkte</div>' + kpiContext(configdata.kpiKontext1, "1") + '</div></div></div>' +
         '<div class="col-6 col-md-4"><div class="card border-info h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-info">' + categories + '</div><div class="text-muted small">Kategorien</div>' + kpiContext(configdata.kpiKontext2, "2") + '</div></div></div>' +
-        '<div class="col-6 col-md-4"><div class="card border-success h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-success">' + latestVal + '</div><div class="text-muted small">Aktueller Wert</div>' + kpiContext(configdata.kpiKontext3, "3") + '</div></div></div>';
+        '<div class="col-6 col-md-4"><div class="card border-success h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-success">' + escapeHtml(latestVal) + '</div><div class="text-muted small">Aktueller Wert</div>' + kpiContext(configdata.kpiKontext3, "3") + '</div></div></div>';
     }
 
     // Chart rendern
@@ -601,6 +601,18 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// Laesst nur http- und https-URLs durch. Ohne diese Pruefung wuerde eine
+// javascript:-URL aus Datenquelle oder Instanz-Konfiguration beim Klick
+// ausgefuehrt.
+function safeUrl(value = "") {
+  try {
+    const url = new URL(String(value), window.location.href);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
+  } catch {
+    return "";
+  }
 }
 
 /* ── Schale 4: Weiterführende Links ── */

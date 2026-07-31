@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.6.0 - 2026-07-31
+- FIX: URL-Attribute werden auf http/https geprüft (F-08); eine javascript:-URL aus der Datenquelle ist nicht mehr ausführbar
+- FIX: Maskierung auf alle Daten- und Attributkontexte ausgedehnt (F-08)
+- CHG: toter Konfigurationsschlüssel lizenz entfernt (F-17)
+- CHG: brandingCSS und brandingCSSFile als Base-Abhängigkeiten deklariert und lokal gespiegelt (F-17)
+- CHG: format.typ von "String" auf v1-sicheres "string" korrigiert (F-18)
+- CHG: datenpunktlimit von "Zahl" auf "string" mit Default "9999" (F-18)
+- CHG: dropdown-Default auf Feldebene verschoben statt in format (F-18)
+- CHG: Template-Platzhalter in den Tags durch reale Tags ersetzt (F-21)
+- FIX: defekte Icon- und Screenshot-Referenzen korrigiert (F-19)
+- CHG: daten.schema auf assets/schema.json gesetzt (F-20)
+
 ## 1.5.0 - 2026-07-30
 
 - **FIX:** Laufzeitfehler nach dem Laden der Konfiguration werden jetzt sichtbar gemeldet; `handleRouting()` wird `await`et und besitzt einen Fehlerpfad
