@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.9.0 - 2026-07-31
+- FIX: Ueberfluessiges `$ ` im zip-Ziel des Makefiles entfernt (F-22)
+
 ## 1.8.0 - 2026-07-31
 - FIX: CSV-Zerlegung auf den Konventions-Parser umgestellt (F-14) - Semikolon-Quellen,
   gequotete Felder und CRLF-Zeilenenden werden korrekt gelesen

@@ -60,7 +60,7 @@ config: ## show docker-compose config
 	${DC} config
 
 zip: ## App zur Auslieferung vorbereiten
-	zip -r $ odas-app-realtimedataview.zip \
+	zip -r ${current_dir}.zip \
 	 	app assets app-package.json CHANGELOG.md
 
 check-app: ## App prüfen mit Skript aus ODAS-Tools
