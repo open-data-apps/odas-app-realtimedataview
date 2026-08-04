@@ -5,7 +5,7 @@
   "seitentitel": "Realtime Data View App",
   "icon": "logo_ondics.png",
   "brandingCSS": "",
-  "dateneinheit": "",
+  "dateneinheit": "Einheiten",
   "datenpunktlimit": 50,
   "beschreibung": [
     "<p>Die Realtime Data View-App visualisiert Zeitreihen und Messdaten aus offenen Datenquellen.</p>",
