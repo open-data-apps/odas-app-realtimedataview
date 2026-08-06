@@ -65,7 +65,7 @@ Beim Aufruf dieser App werden folgende externe Server kontaktiert:
 
 - `cdn.jsdelivr.net` — Vega (Diagramm-Rendering), Vega-Embed (Diagramm-Einbettung), Vega-Lite (Diagrammspezifikation)
 
-Diese Anbieter bleiben auch im Standalone-Betrieb extern; ein vollständig autarker Betrieb ohne Internetzugang ist derzeit nicht möglich. Bootstrap, Leaflet und Chart.js werden seit Version 1.12.0 lokal aus `app/vendor/` ausgeliefert und nicht mehr extern geladen.
+Diese Anbieter bleiben auch im Standalone-Betrieb extern; ein vollständig autarker Betrieb ohne Internetzugang ist derzeit nicht möglich. Bootstrap, Leaflet und Chart.js werden seit Version 1.11.0 lokal aus `app/vendor/` ausgeliefert und nicht mehr extern geladen.
 
 ### Auslieferung an den ODAS
 
