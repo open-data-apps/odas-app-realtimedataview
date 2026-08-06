@@ -792,9 +792,9 @@ function loadVega() {
   if (vegaLoadPromise) return vegaLoadPromise;
 
   vegaLoadPromise = [
-    "https://cdn.jsdelivr.net/npm/vega@5.33.1/build/vega.min.js",
-    "https://cdn.jsdelivr.net/npm/vega-lite@5.23.0/build/vega-lite.min.js",
-    "https://cdn.jsdelivr.net/npm/vega-embed@6.29.0/build/vega-embed.min.js",
+    "vendor/vega/vega.min.js",
+    "vendor/vega/vega-lite.min.js",
+    "vendor/vega/vega-embed.min.js",
   ].reduce(
     (kette, src) => kette.then(() => loadScriptOnce(src)),
     Promise.resolve(),

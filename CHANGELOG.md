@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.15.0 - 2026-08-06
+- FIX: Vega, Vega-Lite und Vega-Embed vendored in `app/vendor/` statt von CDN geladen (Vendoring Teil 3) — Standalone-Betrieb laedt die Zusatzbibliotheken nicht mehr extern
+
 ## 1.14.0 - 2026-08-06
 - FIX: Vega auf 5.33.1, Vega-Lite auf 5.23.0, Vega-Embed auf 6.29.0 exakt gepinnt (vorher nur Major-Version — bei jedem Aufruf eine andere Version, Voraussetzung fuer Vendoring)
 
