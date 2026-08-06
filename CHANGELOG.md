@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.18.0 - 2026-08-06
+- FIX: DOM-Zugriffe auf den App-Container gescopt (F-25)
+
 ## 1.17.0 - 2026-08-06
 - FIX: Datenschutzangabe beschreibt den tatsaechlichen Stand nach dem Vendoring (Welle G)
 

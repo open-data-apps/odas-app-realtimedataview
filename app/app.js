@@ -342,7 +342,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     var categories = [...new Set(data.filter(function(d) { return d.category; }).map(function(d) { return d.category; }))].length;
     var latestVal = latestValue;
     
-    var kpiRowEl = document.getElementById("rt-kpi-row");
+    var kpiRowEl = enclosingHtmlDivElement.querySelector("#rt-kpi-row");
     if (kpiRowEl) {
       kpiRowEl.innerHTML = '<div class="col-6 col-md-4"><div class="card border-primary h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-primary">' + totalRecords + '</div><div class="text-muted small">Datenpunkte</div>' + kpiContext(configdata.kpiKontext1, "1") + '</div></div></div>' +
         '<div class="col-6 col-md-4"><div class="card border-info h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-info">' + categories + '</div><div class="text-muted small">Kategorien</div>' + kpiContext(configdata.kpiKontext2, "2") + '</div></div></div>' +
@@ -641,7 +641,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       }
 
       var nowStr = new Date().toLocaleString("de-DE");
-      var badge = document.getElementById("rt-datenladung");
+      var badge = enclosingHtmlDivElement.querySelector("#rt-datenladung");
       if (badge) badge.textContent = "Letzte Datenladung: " + nowStr;
     } catch (err) {
       const alert = document.createElement("div");
