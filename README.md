@@ -59,14 +59,6 @@ leitet auf den internen Nginx-Port 80 weiter. Die Konfiguration wird aus derselb
 `odas-config/config.json` gelesen wie in der Entwicklung und von Nginx unter `/config`
 ausgeliefert.
 
-### Beim Aufruf kontaktierte Drittanbieter
-
-Beim Aufruf dieser App werden folgende externe Server kontaktiert:
-
-- `cdn.jsdelivr.net` — Vega (Diagramm-Rendering), Vega-Embed (Diagramm-Einbettung), Vega-Lite (Diagrammspezifikation)
-
-Diese Anbieter bleiben auch im Standalone-Betrieb extern; ein vollständig autarker Betrieb ohne Internetzugang ist derzeit nicht möglich. Bootstrap, Leaflet und Chart.js werden seit Version 1.11.0 lokal aus `app/vendor/` ausgeliefert und nicht mehr extern geladen.
-
 ### Auslieferung an den ODAS
 
 `make zip` erzeugt das Liefer-ZIP mit `app/`, `assets/`, `app-package.json` und

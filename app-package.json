@@ -3,7 +3,7 @@
   "app-entwickler-name": "ondics-gmbh",
   "name-in-url": "realtime-data-view",
   "name": "Realtime Data View",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
   "kurzbeschreibung": "Diese Open Data App ist zur Visualisierung von Realtime Data.",
@@ -180,8 +180,7 @@
       },
       "default": [
         "_multiline_",
-        "Alle Daten sind geschützt.",
-        "<h3>Beim Aufruf kontaktierte Drittanbieter</h3><p>Beim Aufruf dieser App werden Bibliotheken bzw. Kartendienste von folgenden externen Servern geladen. Dabei werden IP-Adresse und User-Agent der Besucher:innen an diese Anbieter übertragen:</p><ul><li><strong>cdn.jsdelivr.net</strong> — Vega (Diagramm-Rendering), Vega-Embed (Diagramm-Einbettung), Vega-Lite (Diagrammspezifikation)</li></ul>"
+        "Alle Daten sind geschützt."
       ],
       "erforderlich": "ja"
     },
