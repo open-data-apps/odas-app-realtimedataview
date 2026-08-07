@@ -4,6 +4,8 @@
 - @param {HTMLElement} enclosingHtmlDivElement - Container für den Content
 - @returns {null}
 */
+let rtInstanzZaehler = 0;
+
 /*
  * Template-Hook (oda-generic 1.4.0). Die Base ruft ihn vor dem Rendern der neuen Seite
  * auf. app() registriert beim Aufbau der Startseite `window.clearStartseiteInterval`, um
@@ -153,6 +155,7 @@ async function fetchOdasJson(targetUrl, configdata = {}) {
 }
 
 async function app(configdata = {}, enclosingHtmlDivElement) {
+  const rtUid = "i" + ++rtInstanzZaehler;
   enclosingHtmlDivElement.innerHTML = "";
   const startseiteContainer = document.createElement("div");
   startseiteContainer.className =
@@ -303,7 +306,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       weitereDiv.innerHTML = renderWeitereInfos(configdata);
       if (weitereDiv.innerHTML) contentContainer.appendChild(weitereDiv);
       var methodikDiv = document.createElement("div");
-      methodikDiv.innerHTML = renderMethodikbox(configdata);
+      methodikDiv.innerHTML = renderMethodikbox(configdata, rtUid);
       if (methodikDiv.innerHTML) contentContainer.appendChild(methodikDiv);
 
       startseiteContainer.appendChild(contentContainer);
@@ -344,9 +347,9 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     
     var kpiRowEl = enclosingHtmlDivElement.querySelector("#rt-kpi-row");
     if (kpiRowEl) {
-      kpiRowEl.innerHTML = '<div class="col-6 col-md-4"><div class="card border-primary h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-primary">' + totalRecords + '</div><div class="text-muted small">Datenpunkte</div>' + kpiContext(configdata.kpiKontext1, "1") + '</div></div></div>' +
-        '<div class="col-6 col-md-4"><div class="card border-info h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-info">' + categories + '</div><div class="text-muted small">Kategorien</div>' + kpiContext(configdata.kpiKontext2, "2") + '</div></div></div>' +
-        '<div class="col-6 col-md-4"><div class="card border-success h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-success">' + escapeHtml(latestVal) + '</div><div class="text-muted small">Aktueller Wert</div>' + kpiContext(configdata.kpiKontext3, "3") + '</div></div></div>';
+      kpiRowEl.innerHTML = '<div class="col-6 col-md-4"><div class="card border-primary h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-primary">' + totalRecords + '</div><div class="text-muted small">Datenpunkte</div>' + kpiContext(configdata.kpiKontext1, "1", rtUid) + '</div></div></div>' +
+        '<div class="col-6 col-md-4"><div class="card border-info h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-info">' + categories + '</div><div class="text-muted small">Kategorien</div>' + kpiContext(configdata.kpiKontext2, "2", rtUid) + '</div></div></div>' +
+        '<div class="col-6 col-md-4"><div class="card border-success h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-success">' + escapeHtml(latestVal) + '</div><div class="text-muted small">Aktueller Wert</div>' + kpiContext(configdata.kpiKontext3, "3", rtUid) + '</div></div></div>';
     }
 
     // Chart rendern
@@ -703,10 +706,10 @@ function safeUrl(value = "") {
 /* ── Schale 4: Weiterführende Links ── */
 
   /* ── Schale 4: KPI Kontext ── */
-  function kpiContext(kontext, id) {
+  function kpiContext(kontext, id, uid) {
     var text = String(kontext || "").trim();
     if (!text) return "";
-    var targetId = "rt-kpi-kontext-" + id;
+    var targetId = "rt-kpi-kontext-" + id + "-" + uid;
     return (
       '<button class="rt-kpi-info-toggle collapsed" type="button" ' +
       'data-bs-toggle="collapse" data-bs-target="#' + targetId + '" ' +
@@ -721,7 +724,7 @@ function safeUrl(value = "") {
   }
 
   /* ── Schale 4: Methodikbox ── */
-  function renderMethodikbox(cfg) {
+  function renderMethodikbox(cfg, uid) {
     var hinweis = ((cfg && cfg.datenquelleHinweis) || "").trim();
     var stand = ((cfg && cfg.datenStand) || "").trim();
     if (!hinweis && !stand) return "";
@@ -731,12 +734,12 @@ function safeUrl(value = "") {
     return (
       '<section class="rt-methodik mt-3">' +
       '<button class="rt-methodik-toggle collapsed" type="button" ' +
-      'data-bs-toggle="collapse" data-bs-target="#rt-methodik-body" ' +
-      'aria-expanded="false" aria-controls="rt-methodik-body">' +
+      'data-bs-toggle="collapse" data-bs-target="#rt-methodik-body-' + uid + '" ' +
+      'aria-expanded="false" aria-controls="rt-methodik-body-' + uid + '">' +
       '<h2 class="h5 mb-0">Methodik &amp; Datenquelle</h2>' +
       '<span class="rt-methodik-chevron" aria-hidden="true">&#9662;</span>' +
       "</button>" +
-      '<div id="rt-methodik-body" class="collapse">' +
+      '<div id="rt-methodik-body-' + uid + '" class="collapse">' +
       '<div class="rt-methodik-content">' +
       standHtml +
       hinweis +

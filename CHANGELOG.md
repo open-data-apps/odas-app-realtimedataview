@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.19.0 - 2026-08-07
+- FIX: Bootstrap-Ziele instanzeindeutig machen (F-32)
+
 ## 1.18.0 - 2026-08-06
 - FIX: DOM-Zugriffe auf den App-Container gescopt (F-25)
 
