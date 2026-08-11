@@ -7,16 +7,26 @@
 let rtInstanzZaehler = 0;
 
 /*
+ * F-42: Per-Instanz-Cleanup-Registry. Die Base ruft onPageLeave(page) ohne
+ * Container auf; die App wird aber immer in #main-content gemountet. Jede
+ * Instanz registriert hier unter ihrem Container ihre Cleanup-Funktion, so
+ * erreicht onPageLeave die richtige Instanz. Interface für Task 9.2 (F-43):
+ * Die Cleanup-Funktion wird dort um weitere Ressourcen (disposed-Flag,
+ * Chart-Teardown, Abort) erweitert; Lookup bleibt dieser eine Registry-Zugriff.
+ */
+const rtCleanupRegistry = new WeakMap();
+
+/*
  * Template-Hook (oda-generic 1.4.0). Die Base ruft ihn vor dem Rendern der neuen Seite
- * auf. app() registriert beim Aufbau der Startseite `window.clearStartseiteInterval`, um
- * sein 10-Sekunden-Polling wieder stoppen zu koennen; ohne diesen Aufruf liefe es auf den
- * Unterseiten weiter. Frueher rief app/app-base.js die Funktion selbst auf und wich
- * dadurch vom Template ab.
+ * auf. onPageLeave stoppt das 10-Sekunden-Polling der Instanz, die im #main-content
+ * gemountet ist; ohne diesen Aufruf liefe es auf den Unterseiten weiter. Frueher rief
+ * app/app-base.js die Funktion selbst auf und wich dadurch vom Template ab; seit F-42
+ * laeuft das Cleanup über die Instanz-Registry statt über window.clearStartseiteInterval.
  */
 function onPageLeave(page) {
-  if (typeof window.clearStartseiteInterval === "function") {
-    window.clearStartseiteInterval();
-  }
+  const container = document.getElementById("main-content");
+  const cleanup = container ? rtCleanupRegistry.get(container) : null;
+  if (typeof cleanup === "function") cleanup();
 }
 
 function isOdasProxyEnabled(configdata = {}) {
@@ -155,7 +165,14 @@ async function fetchOdasJson(targetUrl, configdata = {}) {
 }
 
 async function app(configdata = {}, enclosingHtmlDivElement) {
-  const rtUid = "i" + ++rtInstanzZaehler;
+  // F-42: pro Instanz geschlossener State (Closure in app())
+  const state = {
+    uid: "i" + ++rtInstanzZaehler,
+    root: enclosingHtmlDivElement,
+    config: configdata,
+    disposed: false, // wird in Task 9 (onPageLeave) gesetzt
+    updateInterval: null,
+  };
   enclosingHtmlDivElement.innerHTML = "";
   const startseiteContainer = document.createElement("div");
   startseiteContainer.className =
@@ -262,8 +279,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     flexRow,
     infoLeft,
     infoRight,
-    chartDiv,
-    updateInterval;
+    chartDiv;
 
   // Funktion zum Rendern der Infoleiste und des Charts
   async function renderContent(data, lastMod) {
@@ -283,7 +299,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       flexRow.appendChild(infoRight);
 
       chartDiv = document.createElement("div");
-      chartDiv.id = "vega-chart";
+      chartDiv.id = "vega-chart-" + state.uid;
       chartDiv.className =
         "w-100 flex-grow-1 d-flex justify-content-center align-items-center";
 
@@ -306,7 +322,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       weitereDiv.innerHTML = renderWeitereInfos(configdata);
       if (weitereDiv.innerHTML) contentContainer.appendChild(weitereDiv);
       var methodikDiv = document.createElement("div");
-      methodikDiv.innerHTML = renderMethodikbox(configdata, rtUid);
+      methodikDiv.innerHTML = renderMethodikbox(configdata, state.uid);
       if (methodikDiv.innerHTML) contentContainer.appendChild(methodikDiv);
 
       startseiteContainer.appendChild(contentContainer);
@@ -347,9 +363,9 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     
     var kpiRowEl = enclosingHtmlDivElement.querySelector("#rt-kpi-row");
     if (kpiRowEl) {
-      kpiRowEl.innerHTML = '<div class="col-6 col-md-4"><div class="card border-primary h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-primary">' + totalRecords + '</div><div class="text-muted small">Datenpunkte</div>' + kpiContext(configdata.kpiKontext1, "1", rtUid) + '</div></div></div>' +
-        '<div class="col-6 col-md-4"><div class="card border-info h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-info">' + categories + '</div><div class="text-muted small">Kategorien</div>' + kpiContext(configdata.kpiKontext2, "2", rtUid) + '</div></div></div>' +
-        '<div class="col-6 col-md-4"><div class="card border-success h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-success">' + escapeHtml(latestVal) + '</div><div class="text-muted small">Aktueller Wert</div>' + kpiContext(configdata.kpiKontext3, "3", rtUid) + '</div></div></div>';
+      kpiRowEl.innerHTML = '<div class="col-6 col-md-4"><div class="card border-primary h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-primary">' + totalRecords + '</div><div class="text-muted small">Datenpunkte</div>' + kpiContext(configdata.kpiKontext1, "1", state.uid) + '</div></div></div>' +
+        '<div class="col-6 col-md-4"><div class="card border-info h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-info">' + categories + '</div><div class="text-muted small">Kategorien</div>' + kpiContext(configdata.kpiKontext2, "2", state.uid) + '</div></div></div>' +
+        '<div class="col-6 col-md-4"><div class="card border-success h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-success">' + escapeHtml(latestVal) + '</div><div class="text-muted small">Aktueller Wert</div>' + kpiContext(configdata.kpiKontext3, "3", state.uid) + '</div></div></div>';
     }
 
     // Chart rendern
@@ -543,7 +559,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     spec.width = "container";
     spec.height = 400;
     await loadVega();
-    await vegaEmbed("#vega-chart", spec, {
+    await vegaEmbed(chartDiv, spec, {
       mode: "vega-lite",
       renderer: "canvas",
       actions: false,
@@ -663,20 +679,21 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
   await loadAndRender();
 
   // Automatische Aktualisierung alle 10 Sekunden - nur auf der Startseite
-  updateInterval = setInterval(() => {
+  state.updateInterval = setInterval(() => {
     // Prüfe ob wir noch auf der Startseite sind
     if (enclosingHtmlDivElement.querySelector(".startseite-content")) {
       loadAndRender();
     }
   }, 10000);
 
-  // Cleanup-Funktion für das Interval
-  window.clearStartseiteInterval = () => {
-    if (updateInterval) {
-      clearInterval(updateInterval);
-      updateInterval = null;
+  // F-42: Cleanup je Instanz in der Registry ablegen (Interface für Task 9.2,
+  // der onPageLeave-Teardown wird dort um weitere Ressourcen erweitert).
+  rtCleanupRegistry.set(enclosingHtmlDivElement, () => {
+    if (state.updateInterval) {
+      clearInterval(state.updateInterval);
+      state.updateInterval = null;
     }
-  };
+  });
 
   return null; // explizit null zurückgeben, kein Promise
 }

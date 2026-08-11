@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.20.0 - 2026-08-11
+- FIX: Laufzeitzustand pro App-Instanz isoliert (F-42): `window.clearStartseiteInterval` entfernt — das Polling-Intervall liegt jetzt im Instanz-State (`state.updateInterval`), je Instanz wird eine Cleanup-Funktion in einer WeakMap-Registry (`rtCleanupRegistry`, Schlüssel: App-Container) abgelegt, die `onPageLeave` über `#main-content` erreicht (Interface für den F-43-Teardown); Vega-Chart-Div-ID instanzeindeutig (`vega-chart-<uid>`) und `vegaEmbed` erhält das Element statt eines ID-Strings
+
 ## 1.19.0 - 2026-08-07
 - FIX: Bootstrap-Ziele instanzeindeutig machen (F-32)
 
