@@ -7,26 +7,28 @@
 let rtInstanzZaehler = 0;
 
 /*
- * F-42: Per-Instanz-Cleanup-Registry. Die Base ruft onPageLeave(page) ohne
- * Container auf; die App wird aber immer in #main-content gemountet. Jede
- * Instanz registriert hier unter ihrem Container ihre Cleanup-Funktion, so
- * erreicht onPageLeave die richtige Instanz. Interface für Task 9.2 (F-43):
- * Die Cleanup-Funktion wird dort um weitere Ressourcen (disposed-Flag,
- * Chart-Teardown, Abort) erweitert; Lookup bleibt dieser eine Registry-Zugriff.
+ * F-42/F-43: Per-Instanz-Cleanup-Registry. Die Base ruft onPageLeave(page) ohne
+ * Container auf; jede Instanz registriert hier unter ihrem Container ihre
+ * Cleanup-Funktion. Bewusst eine iterierbare Map statt WeakMap: Szenario 9
+ * (mehrere gleichzeitig gemountete Instanzen in verschiedenen Containern)
+ * verlangt, dass onPageLeave ALLE registrierten Instanzen räumt — ein
+ * Einzel-Lookup über #main-content würde weitere Container übersehen.
  */
-const rtCleanupRegistry = new WeakMap();
+const rtCleanupRegistry = new Map();
 
 /*
  * Template-Hook (oda-generic 1.4.0). Die Base ruft ihn vor dem Rendern der neuen Seite
- * auf. onPageLeave stoppt das 10-Sekunden-Polling der Instanz, die im #main-content
- * gemountet ist; ohne diesen Aufruf liefe es auf den Unterseiten weiter. Frueher rief
- * app/app-base.js die Funktion selbst auf und wich dadurch vom Template ab; seit F-42
- * laeuft das Cleanup über die Instanz-Registry statt über window.clearStartseiteInterval.
+ * auf. onPageLeave räumt ALLE registrierten Instanzen: disposed-Flag setzen und das
+ * 10-Sekunden-Polling stoppen. Ohne diesen Aufruf liefe das Polling auf den
+ * Unterseiten weiter. Frueher rief app/app-base.js die Funktion selbst auf und wich
+ * dadurch vom Template ab; seit F-42 laeuft das Cleanup über die Instanz-Registry
+ * statt über window.clearStartseiteInterval.
  */
 function onPageLeave(page) {
-  const container = document.getElementById("main-content");
-  const cleanup = container ? rtCleanupRegistry.get(container) : null;
-  if (typeof cleanup === "function") cleanup();
+  rtCleanupRegistry.forEach((cleanup, container) => {
+    if (typeof cleanup === "function") cleanup();
+    rtCleanupRegistry.delete(container);
+  });
 }
 
 function isOdasProxyEnabled(configdata = {}) {
@@ -559,6 +561,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     spec.width = "container";
     spec.height = 400;
     await loadVega();
+    if (state.disposed) return;
     await vegaEmbed(chartDiv, spec, {
       mode: "vega-lite",
       renderer: "canvas",
@@ -601,6 +604,11 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
 
   // Funktion zum Laden der Daten und Aktualisieren der Anzeige (über Proxy)
   async function loadAndRender() {
+    // F-43: Fehler-/Hinweis-/Leer-Meldungen vorheriger Polls ersetzen statt
+    // anhäufen — zwei aufeinanderfolgende Poll-Fehler zeigen genau eine
+    // aktuelle Fehlermeldung.
+    startseiteContainer.querySelectorAll(".alert").forEach((el) => el.remove());
+
     // Spinner anzeigen (sofort ausblenden nach Laden)
     let spinnerElem;
     // Suche nach dem Spinner im aktuellen infoRight (kann sich bei jedem Render ändern)
@@ -613,6 +621,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     try {
       // CSV-Daten laden: direkt oder ueber den ODAS-Proxy (proxyAktiv)
       const csvText = await fetchOdasResource(configdata.apiurl, configdata);
+      if (state.disposed) return;
       const { rows: geparst, verworfen } = parseCSV(csvText);
       let data = geparst;
 
@@ -642,6 +651,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
         lastMod = new Date().toLocaleString("de-DE");
       }
       await renderContent(data, lastMod);
+      if (state.disposed) return;
 
       if (data.length === 0) {
         const leer = document.createElement("div");
@@ -663,6 +673,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       var badge = enclosingHtmlDivElement.querySelector("#rt-datenladung");
       if (badge) badge.textContent = "Letzte Datenladung: " + nowStr;
     } catch (err) {
+      if (state.disposed) return;
       const alert = document.createElement("div");
       alert.className = "alert alert-danger text-center";
       alert.textContent = `Fehler: ${err.message}`;
@@ -677,6 +688,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
 
   // Initiales Laden
   await loadAndRender();
+  if (state.disposed) return null;
 
   // Automatische Aktualisierung alle 10 Sekunden - nur auf der Startseite
   state.updateInterval = setInterval(() => {
@@ -686,9 +698,11 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     }
   }, 10000);
 
-  // F-42: Cleanup je Instanz in der Registry ablegen (Interface für Task 9.2,
-  // der onPageLeave-Teardown wird dort um weitere Ressourcen erweitert).
+  // F-42/F-43: Cleanup je Instanz in der Registry ablegen. onPageLeave ruft
+  // diese Funktion bei ALLEN registrierten Instanzen auf: disposed-Flag setzen
+  // (macht späte Fetch-/Render-Ergebnisse wirkungslos) und Polling stoppen.
   rtCleanupRegistry.set(enclosingHtmlDivElement, () => {
+    state.disposed = true;
     if (state.updateInterval) {
       clearInterval(state.updateInterval);
       state.updateInterval = null;

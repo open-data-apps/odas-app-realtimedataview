@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.21.0 - 2026-08-11
+- FIX: Laufzeitressourcen beim Seitenwechsel freigeben (F-43): `onPageLeave` räumt jetzt über alle Registry-Einträge (iterierbare Map statt WeakMap-Einzel-Lookup über `#main-content`, damit auch zusätzlich gemountete Instanzen geräumt werden); Cleanup setzt das `disposed`-Flag und stoppt das 10-Sekunden-Polling; Fehler-/Hinweis-Meldungen vorheriger Polls werden ersetzt statt angehäuft, späte Fetch-/Render-Ergebnisse sind nach Teardown wirkungslos
+
 ## 1.20.0 - 2026-08-11
 - FIX: Laufzeitzustand pro App-Instanz isoliert (F-42): `window.clearStartseiteInterval` entfernt — das Polling-Intervall liegt jetzt im Instanz-State (`state.updateInterval`), je Instanz wird eine Cleanup-Funktion in einer WeakMap-Registry (`rtCleanupRegistry`, Schlüssel: App-Container) abgelegt, die `onPageLeave` über `#main-content` erreicht (Interface für den F-43-Teardown); Vega-Chart-Div-ID instanzeindeutig (`vega-chart-<uid>`) und `vegaEmbed` erhält das Element statt eines ID-Strings
 
