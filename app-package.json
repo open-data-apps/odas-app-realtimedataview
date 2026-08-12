@@ -43,6 +43,7 @@
   "instanz-config": {
     "dateneinheit": {
       "label": "Daten Einheit",
+      "category": "metrics",
       "hilfe": [
         "Hier wird angegeben in welcher Einheit die Daten sind."
       ],
@@ -55,6 +56,7 @@
     },
     "datenpunktlimit": {
       "label": "Datenpunkt Limit",
+      "category": "advanced",
       "hilfe": [
         "_multiline_",
         "Hier kann das Limit eingestellt werden für die Anzeige der Datenpunkte des Datensatzes.",
@@ -69,6 +71,7 @@
     },
     "chartType": {
       "label": "Chart Typ",
+      "category": "advanced",
       "hilfe": [
         "_multiline_",
         "Hier können Sie den gewünschten Chart Typ angeben mit dem Sie die Daten visualisert werden.",
@@ -84,6 +87,7 @@
     },
     "seitentitel": {
       "label": "Seitentitel",
+      "category": "general",
       "hilfe": "Der Seitentitel wird im Browser-Tab der App angezeigt",
       "default": "Realtime Data View ODA",
       "format": {
@@ -94,6 +98,7 @@
     },
     "titel": {
       "label": "Titel",
+      "category": "general",
       "hilfe": "Der Titel wird in der Titelzeile der App angezeigt",
       "default": "Realtime Data View",
       "format": {
@@ -104,6 +109,7 @@
     },
     "icon": {
       "label": "App-Icon",
+      "category": "general",
       "hilfe": "Das Icon wird links oben in der Titelzeile angezeigt",
       "default": "{{{odp.logo}}}",
       "format": {
@@ -115,6 +121,7 @@
     },
     "kontakt": {
       "label": "Kontakt",
+      "category": "contact-legal",
       "hilfe": "Der Text wird im Menüpunkt 'Kontakt' anzeigt",
       "format": {
         "typ": "markdown"
@@ -131,6 +138,7 @@
     },
     "beschreibung": {
       "label": "Beschreibung",
+      "category": "content",
       "hilfe": "Der Text wird im Menüpunkt 'Über diese App' anzeigt",
       "format": {
         "typ": "markdown"
@@ -155,6 +163,7 @@
     },
     "impressum": {
       "label": "Impressum",
+      "category": "contact-legal",
       "hilfe": "Der Text wird im Menüpunkt 'Impressum' anzeigt",
       "format": {
         "typ": "markdown"
@@ -174,6 +183,7 @@
     },
     "datenschutz": {
       "label": "Datenschutz",
+      "category": "contact-legal",
       "hilfe": "Der Text wird im Menüpunkt 'Datenschutz' anzeigt",
       "format": {
         "typ": "markdown"
@@ -188,6 +198,7 @@
     },
     "urlDaten": {
       "label": "URL zum Datensatz im ODP",
+      "category": "datasource",
       "hilfe": "Der Datensatz im Open Data Portal mit den Daten der Realtime Data View App",
       "format": {
         "typ": "url"
@@ -198,6 +209,7 @@
     },
     "fusszeile": {
       "label": "Fußzeile",
+      "category": "contact-legal",
       "hilfe": "Wird auf der Website unten in der Fusszeile angezeigt.",
       "format": {
         "typ": "string",
@@ -208,6 +220,7 @@
     },
     "proxyAktiv": {
       "label": "ODAS-Proxy aktivieren",
+      "category": "datasource",
       "hilfe": "Mit ja werden Datenabrufe über den ODAS-Proxy gesendet. Der Proxy ist nur im ODAS-Live-System verfügbar; Entwicklung und Standalone verwenden nein.",
       "default": "nein",
       "format": {
@@ -221,6 +234,7 @@
     },
     "apiurl": {
       "label": "URL zu den Daten",
+      "category": "datasource",
       "hilfe": "Von dieser URL zum Datensatz werden die Ressoucen bezogen",
       "format": {
         "typ": "url",
@@ -232,6 +246,7 @@
     },
     "sprache": {
       "label": "Sprache der App",
+      "category": "general",
       "hilfe": "Angabe der App-Sprache",
       "default": "de",
       "format": {
@@ -244,6 +259,7 @@
     },
     "weiterfuehrendeLinks": {
       "label": "Weiterführende Links",
+      "category": "content",
       "hilfe": "Verwandte Datensätze / Hintergrundquellen (HTML/Markdown). Leer = ausgeblendet.",
       "format": {
         "typ": "markdown"
@@ -253,6 +269,7 @@
     },
     "datenquelleHinweis": {
       "label": "Methodik / Datenquelle-Hinweis",
+      "category": "content",
       "hilfe": "Herkunft, Erhebungsmethode und Limitierungen (HTML/Markdown). Leer = ausgeblendet.",
       "format": {
         "typ": "markdown"
@@ -262,6 +279,7 @@
     },
     "datenStand": {
       "label": "Datenstand",
+      "category": "content",
       "hilfe": "Freitext-Hinweis zum Stand der Daten. Leer = ausgeblendet.",
       "format": {
         "typ": "string",
@@ -272,6 +290,7 @@
     },
     "kpiKontext1": {
       "label": "KPI-Erklärung 1: Datenpunkte",
+      "category": "metrics",
       "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
       "format": {
         "typ": "string",
@@ -282,6 +301,7 @@
     },
     "kpiKontext2": {
       "label": "KPI-Erklärung 2: Aktueller Wert",
+      "category": "metrics",
       "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
       "format": {
         "typ": "string",
@@ -292,6 +312,7 @@
     },
     "kpiKontext3": {
       "label": "KPI-Erklärung 3: Datum des Wertes",
+      "category": "metrics",
       "hilfe": "Erklärtext unter dem KPI-Wert. Leer = ausgeblendet.",
       "format": {
         "typ": "string",
@@ -302,6 +323,7 @@
     },
     "brandingCSS": {
       "label": "Zusätzliches Branding-CSS",
+      "category": "advanced",
       "hilfe": "Optionaler CSS-Code für die konkrete App-Instanz.",
       "default": "",
       "format": {
@@ -312,6 +334,7 @@
     },
     "brandingCSSFile": {
       "label": "Branding-CSS-Datei",
+      "category": "advanced",
       "hilfe": "Optionale URL zu einer zusätzlichen CSS-Datei für die konkrete App-Instanz.",
       "default": "",
       "format": {
