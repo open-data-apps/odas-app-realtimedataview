@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.22.0 - 2026-08-12
+- FIX: Toten ID-Selektor `#vega-chart` auf Klassen-Selektor `.rt-vega-chart` umgestellt — die Chart-Regeln greifen nach der instanzeindeutigen ID-Umstellung wieder (F-54)
+
 ## 1.21.0 - 2026-08-11
 - FIX: Laufzeitressourcen beim Seitenwechsel freigeben (F-43): `onPageLeave` räumt jetzt über alle Registry-Einträge (iterierbare Map statt WeakMap-Einzel-Lookup über `#main-content`, damit auch zusätzlich gemountete Instanzen geräumt werden); Cleanup setzt das `disposed`-Flag und stoppt das 10-Sekunden-Polling; Fehler-/Hinweis-Meldungen vorheriger Polls werden ersetzt statt angehäuft, späte Fetch-/Render-Ergebnisse sind nach Teardown wirkungslos
 

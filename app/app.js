@@ -303,7 +303,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       chartDiv = document.createElement("div");
       chartDiv.id = "vega-chart-" + state.uid;
       chartDiv.className =
-        "w-100 flex-grow-1 d-flex justify-content-center align-items-center";
+        "rt-vega-chart w-100 flex-grow-1 d-flex justify-content-center align-items-center";
 
       rowAndChartContainer = document.createElement("div");
       rowAndChartContainer.className = "w-100 d-flex flex-column gap-1";

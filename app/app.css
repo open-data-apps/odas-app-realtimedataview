@@ -9,14 +9,14 @@
 }
 
 /* Nur für die Startseite: Chart Container und Canvas Styling */
-#main-content .startseite-content #vega-chart {
+#main-content .startseite-content .rt-vega-chart {
   width: 100% !important;
   min-width: 0;
   padding: 0;
   margin: 0 auto;
   height: auto;
 }
-#main-content .startseite-content #vega-chart canvas {
+#main-content .startseite-content .rt-vega-chart canvas {
   width: 100% !important;
   height: auto !important;
   max-width: 100% !important;
@@ -39,7 +39,7 @@
 }
 
 /* Nur für die Startseite: Chart-Container kein Abstand nach oben */
-#main-content .startseite-content #vega-chart {
+#main-content .startseite-content .rt-vega-chart {
   margin-top: 0 !important;
 }
 
