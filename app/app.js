@@ -274,6 +274,13 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     console.warn("Metadaten konnten nicht geladen werden:", e);
   }
 
+  // F-57: Nach onPageLeave auslaufende Metadaten-Fetches (resource_show/
+  // package_show) nicht mehr weiterverarbeiten. Ohne diese Pruefung haengt eine
+  // erst nach dem Seitenwechsel eintreffende Metadaten-Aufloesung den
+  // MetaHeader in den entfernten Container und startet anschliessend
+  // loadAndRender + Polling.
+  if (state.disposed) return null;
+
   // --- Metadaten-Header-HTML ---
   const metaHeader = document.createElement("div");
   metaHeader.className = "mb-4 w-100 text-center";
