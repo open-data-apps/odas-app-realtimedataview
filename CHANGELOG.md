@@ -1,6 +1,9 @@
 # Changelog
 
 
+## 1.24.0 - 2026-08-13
+- FIX: Vega-Lifecycle-Ressourcen finalisieren (F-57): gehaltenes `vegaEmbed`-Result wird beim Seitenwechsel, bei neuem Embed und bei ueberholten/ueberlappenden Embeds per `.finalize()` abgeraeumt (Render-Token pro Instanz); Cleanup-Registrierung synchron direkt nach State-Erzeugung (auch waehrend des initialen Loads wirksam); `onPageLeave` raeumt jede Instanz einzeln abgesichert
+
 ## 1.23.0 - 2026-08-12
 - FIX: `app/index.html` auf den Template-Stand (F-47): Datei byte-gleich aus `oda-generic` übernommen — gültiges HTML, deutsche ARIA-Labels, Footer im Body; Titel und Fußzeile bleiben Platzhalter und werden zur Laufzeit aus der Instanz-Config überschrieben
 

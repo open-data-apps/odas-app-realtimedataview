@@ -26,7 +26,13 @@ const rtCleanupRegistry = new Map();
  */
 function onPageLeave(page) {
   rtCleanupRegistry.forEach((cleanup, container) => {
-    if (typeof cleanup === "function") cleanup();
+    // F-57: jedes Cleanup einzeln absichern — ein werfendes Cleanup darf die
+    // uebrigen Instanzen nicht am Abraeumen hindern.
+    try {
+      if (typeof cleanup === "function") cleanup();
+    } catch (error) {
+      console.warn("Realtimedataview: Cleanup einer Instanz fehlgeschlagen:", error);
+    }
     rtCleanupRegistry.delete(container);
   });
 }
@@ -174,7 +180,29 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     config: configdata,
     disposed: false, // wird in Task 9 (onPageLeave) gesetzt
     updateInterval: null,
+    // F-57: gehaltenes vegaEmbed-Result (Result-Objekt mit finalize()) und ein
+    // monoton wachsender Render-Token, der verspaetete/ueberholte Embeds als
+    // stale markiert (kein Leak, kein Ueberschreiben belegter Results).
+    vegaResult: null,
+    vegaRenderToken: 0,
   };
+  // F-57: Cleanup synchron direkt nach der State-Erzeugung registrieren —
+  // VOR jedem DOM-/Fetch-/await-Schritt. So ist auch ein Seitenwechsel
+  // waehrend des initialen Loads (der spätere Fetch-/Embed-Ergebnisse
+  // wirkungslos machen muss) abgedeckt (frueher lag die Registrierung erst
+  // am Ende von app() und war waehrend des initialen Loads nicht erreichbar).
+  rtCleanupRegistry.set(enclosingHtmlDivElement, () => {
+    state.disposed = true;
+    state.vegaRenderToken++; // alle laufenden/ueberholten Embeds als stale markieren
+    if (state.updateInterval) {
+      clearInterval(state.updateInterval);
+      state.updateInterval = null;
+    }
+    if (state.vegaResult) {
+      state.vegaResult.finalize();
+      state.vegaResult = null;
+    }
+  });
   enclosingHtmlDivElement.innerHTML = "";
   const startseiteContainer = document.createElement("div");
   startseiteContainer.className =
@@ -560,13 +588,29 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     const spec = specFn(data);
     spec.width = "container";
     spec.height = 400;
+    // F-57: jeden Embed-Versuch mit einem eigenen Token versehen. Nur der
+    // zuletzt gestartete Embed darf sein Result behalten; ueberholte/verspaetete
+    // Embeds (Seitenwechsel oder ein neuerer Poll) finalisieren ihr Result
+    // selbst und bleiben so ohne Wirkung.
+    const renderToken = ++state.vegaRenderToken;
     await loadVega();
-    if (state.disposed) return;
-    await vegaEmbed(chartDiv, spec, {
+    if (state.disposed || renderToken !== state.vegaRenderToken) return;
+    // Ein noch gehaltenes Result vor dem Start des neuen Embeds abraeumen.
+    if (state.vegaResult) {
+      state.vegaResult.finalize();
+      state.vegaResult = null;
+    }
+    if (typeof chartDiv.replaceChildren === "function") chartDiv.replaceChildren();
+    const embedResult = await vegaEmbed(chartDiv, spec, {
       mode: "vega-lite",
       renderer: "canvas",
       actions: false,
     });
+    if (state.disposed || renderToken !== state.vegaRenderToken) {
+      embedResult.finalize();
+      return;
+    }
+    state.vegaResult = embedResult;
   }
 
   // --- CSV Parser Funktion ---
@@ -680,7 +724,9 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       startseiteContainer.appendChild(alert);
       console.error(err);
     } finally {
-      // Spinner sofort ausblenden
+      // F-57: nach onPageLeave keine Spinner-Mutation mehr (post-dispose-DOM-
+      // Zugriff) — das Polling greift sonst auf entferntes DOM zu.
+      if (state.disposed) return;
       spinnerElem = findSpinner();
       if (spinnerElem) spinnerElem.style.display = "none";
     }
@@ -697,17 +743,6 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       loadAndRender();
     }
   }, 10000);
-
-  // F-42/F-43: Cleanup je Instanz in der Registry ablegen. onPageLeave ruft
-  // diese Funktion bei ALLEN registrierten Instanzen auf: disposed-Flag setzen
-  // (macht späte Fetch-/Render-Ergebnisse wirkungslos) und Polling stoppen.
-  rtCleanupRegistry.set(enclosingHtmlDivElement, () => {
-    state.disposed = true;
-    if (state.updateInterval) {
-      clearInterval(state.updateInterval);
-      state.updateInterval = null;
-    }
-  });
 
   return null; // explizit null zurückgeben, kein Promise
 }
