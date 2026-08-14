@@ -173,6 +173,13 @@ async function fetchOdasJson(targetUrl, configdata = {}) {
 }
 
 async function app(configdata = {}, enclosingHtmlDivElement) {
+  const quelle = String(configdata.apiurl || "").trim();
+  if (!quelle || /^\{\{.*\}\}$/.test(quelle) || /^<.*>$/.test(quelle)) {
+    enclosingHtmlDivElement.innerHTML =
+      '<div class="alert alert-info" role="alert">Es ist keine Datenquelle konfiguriert.</div>';
+    return;
+  }
+
   // F-42: pro Instanz geschlossener State (Closure in app())
   const state = {
     uid: "i" + ++rtInstanzZaehler,
