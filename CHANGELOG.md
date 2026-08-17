@@ -1,6 +1,9 @@
 # Changelog
 
 
+## 1.25.0 - 2026-08-17
+- **CHG:** `instanz-config`-`category`-Vokabular auf Deutsch umgestellt (`allgemein`, `beschreibung`, `datenherkunft`, `kontakt-rechtliches`, `sonstiges`); die entfallenen Kategorien `metrics` und `advanced` wurden auf `beschreibung` bzw. `sonstiges` verteilt
+
 ## 1.24.0 - 2026-08-13
 - FIX: Vega-Lifecycle-Ressourcen finalisieren (F-57): gehaltenes `vegaEmbed`-Result wird beim Seitenwechsel, bei neuem Embed und bei ueberholten/ueberlappenden Embeds per `.finalize()` abgeraeumt (Render-Token pro Instanz); Cleanup-Registrierung synchron direkt nach State-Erzeugung (auch waehrend des initialen Loads wirksam); `onPageLeave` raeumt jede Instanz einzeln abgesichert
 
