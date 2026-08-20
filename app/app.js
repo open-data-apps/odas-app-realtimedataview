@@ -344,7 +344,12 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     chartDiv;
 
   // Funktion zum Rendern der Infoleiste und des Charts
-  async function renderContent(data, lastMod) {
+  // F-70: renderToken wird von loadAndRender VOR dem ersten await erzeugt und
+  // hier durchgereicht, statt erst kurz vor dem Chart-Embed. So schuetzt
+  // derselbe Token-Vergleich auch die Infoleisten-/KPI-Textmutationen unten,
+  // nicht nur den Vega-Embed.
+  async function renderContent(data, lastMod, renderToken) {
+    if (state.disposed || renderToken !== state.vegaRenderToken) return;
     // Erstelle Container nur beim ersten Aufruf
     if (!contentContainer) {
       // Info-Boxen für links und rechts
@@ -620,11 +625,11 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     const spec = specFn(data);
     spec.width = "container";
     spec.height = 400;
-    // F-57: jeden Embed-Versuch mit einem eigenen Token versehen. Nur der
-    // zuletzt gestartete Embed darf sein Result behalten; ueberholte/verspaetete
-    // Embeds (Seitenwechsel oder ein neuerer Poll) finalisieren ihr Result
-    // selbst und bleiben so ohne Wirkung.
-    const renderToken = ++state.vegaRenderToken;
+    // F-57/F-70: derselbe renderToken (von loadAndRender vor dem ersten await
+    // erzeugt) begleitet den gesamten Ladevorgang. Nur der zuletzt gestartete
+    // Ladevorgang darf sein Result behalten; ueberholte/verspaetete Vorgaenge
+    // (Seitenwechsel oder ein neuerer Poll/Filterwechsel) finalisieren ihr
+    // Result selbst und bleiben so ohne Wirkung.
     await loadVega();
     if (state.disposed || renderToken !== state.vegaRenderToken) return;
     // Ein noch gehaltenes Result vor dem Start des neuen Embeds abraeumen.
@@ -680,6 +685,13 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
 
   // Funktion zum Laden der Daten und Aktualisieren der Anzeige (über Proxy)
   async function loadAndRender() {
+    // F-70: eigener Token pro Ladevorgang, VOR dem ersten await erzeugt. Ein
+    // langsamer, ueberholter Ladevorgang (z.B. vorheriger Poll) erkennt so
+    // nach jedem await, dass inzwischen ein neuerer Ladevorgang gestartet
+    // wurde, und bricht ab statt veraltete Infoleisten-/KPI-Texte oder das
+    // Chart-Embed ueber das aktuelle Ergebnis zu schreiben.
+    const renderToken = ++state.vegaRenderToken;
+
     // F-43: Fehler-/Hinweis-/Leer-Meldungen vorheriger Polls ersetzen statt
     // anhäufen — zwei aufeinanderfolgende Poll-Fehler zeigen genau eine
     // aktuelle Fehlermeldung.
@@ -697,7 +709,7 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     try {
       // CSV-Daten laden: direkt oder ueber den ODAS-Proxy (proxyAktiv)
       const csvText = await fetchOdasResource(configdata.apiurl, configdata);
-      if (state.disposed) return;
+      if (state.disposed || renderToken !== state.vegaRenderToken) return;
       const { rows: geparst, verworfen } = parseCSV(csvText);
       let data = geparst;
 
@@ -726,8 +738,8 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       } else {
         lastMod = new Date().toLocaleString("de-DE");
       }
-      await renderContent(data, lastMod);
-      if (state.disposed) return;
+      await renderContent(data, lastMod, renderToken);
+      if (state.disposed || renderToken !== state.vegaRenderToken) return;
 
       if (data.length === 0) {
         const leer = document.createElement("div");
@@ -749,16 +761,18 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       var badge = enclosingHtmlDivElement.querySelector("#rt-datenladung");
       if (badge) badge.textContent = "Letzte Datenladung: " + nowStr;
     } catch (err) {
-      if (state.disposed) return;
+      if (state.disposed || renderToken !== state.vegaRenderToken) return;
       const alert = document.createElement("div");
       alert.className = "alert alert-danger text-center";
       alert.textContent = `Fehler: ${err.message}`;
       startseiteContainer.appendChild(alert);
       console.error(err);
     } finally {
-      // F-57: nach onPageLeave keine Spinner-Mutation mehr (post-dispose-DOM-
-      // Zugriff) — das Polling greift sonst auf entferntes DOM zu.
-      if (state.disposed) return;
+      // F-57/F-70: nach onPageLeave keine Spinner-Mutation mehr (post-dispose-
+      // DOM-Zugriff) — das Polling greift sonst auf entferntes DOM zu. Ebenso
+      // soll ein ueberholter Ladevorgang den Spinner nicht ausblenden, waehrend
+      // ein neuerer Ladevorgang noch laeuft.
+      if (state.disposed || renderToken !== state.vegaRenderToken) return;
       spinnerElem = findSpinner();
       if (spinnerElem) spinnerElem.style.display = "none";
     }
