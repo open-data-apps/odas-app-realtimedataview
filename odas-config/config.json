@@ -10,12 +10,12 @@
     "<p>Die Realtime Data View-App visualisiert konfigurierbare CSV-Zeitreihen als interaktive Diagramme und Kennzahlen.</p>",
     "<p>Sie lädt Messreihen mit Zeitstempel und Messwerten aus einer offenen CSV-Ressource und macht aktuelle Entwicklungen sowie optionale Kategorien im Browser nachvollziehbar – ohne fachliche Bewertung und ohne Anspruch auf Vollständigkeit.</p>",
     "<h2>Methodik</h2>",
-    "<p>Die App lädt die in <code>apiurl</code> konfigurierte CSV-Zeitreihe direkt im Browser – im Live-Betrieb optional über den ODAS-Proxy (<code>proxyAktiv: ja</code> leitet über <code>/odp-data?path=...</code>, sonst direkter <code>fetch</code>). Der Abruf erfolgt im Browser; die Quelle muss dafür erreichbar sein.</p>",
+    "<p>Die App lädt die in <code>apiurls.messwerte</code> konfigurierte CSV-Zeitreihe direkt im Browser – im Live-Betrieb optional über den ODAS-Proxy (<code>proxyAktiv: ja</code> leitet über <code>/odp-data?path=...</code>, sonst direkter <code>fetch</code>). Der Abruf erfolgt im Browser; die Quelle muss dafür erreichbar sein.</p>",
     "<p>Das Parsen erkennt das Trennzeichen automatisch (Delimiter-Auto-Erkennung für <code>;</code>, <code>,</code>, Tab und <code>|</code>) und verarbeitet gequotete Felder mit doppelten Anführungszeichen sowie <code>CRLF</code>-Zeilenenden; Dezimalkomma wird akzeptiert (Komma zu Punkt normalisiert).</p>",
     "<p>Erwartet werden <code>date</code> (Zeitstempel) und <code>value</code> (Messwert) als Pflichtspalten, optional <code>category</code> zur Gruppierung; zusätzliche Spalten werden ignoriert. Jede Zeile ohne verwertbaren <code>date</code>/<code>value</code> wird verworfen und gezählt – ein Hinweis zeigt die Anzahl verworfener Zeilen.</p>",
     "<p>Es werden die letzten N Datensätze bis zum konfigurierten Limit (<code>datenpunktlimit</code>, maximal 9999) angezeigt; die App wahrt die Quellreihenfolge. Die Anzeige aktualisiert alle 10 Sekunden per Polling, solange die Startseite gemountet ist – kein Streaming, kein WebSocket und keine Live-Garantie, die Darstellung spiegelt den Stand der Quelle.</p>",
     "<p>Die Visualisierung bietet 17 Vega-Lite-Diagrammtypen (Line Chart, Bar Chart, Area Chart, Point Chart, Tick Chart, Circle Chart, Square Chart, Bar Chart Horizontal, Text Chart, Line with Color, Stacked Area, Stacked Bar, Layered Line+Point, Trellis Bar, Trellis Line, Histogram, Aggregate Bar Chart) über <code>vegaEmbed</code> (<code>vega</code>, <code>vega-lite</code>, <code>vega-embed</code>) und 3 KPI-Karten (Anzahl Datenpunkte/Row Count, Anzahl Kategorien/Category Count, aktuellster Wert/Latest Value) mit optionalen Erklärtexten aus <code>kpiKontext1–3</code>.</p>",
-    "<p>Optionale Metadaten (Ressourcen-Titel/Beschreibung, Datensatz-Titel) werden – wenn die URLs eine CKAN-Struktur enthalten – über <code>resource_show</code>/<code>package_show</code> abgeleitet aus <code>apiurl</code>/<code>urlDaten</code> geladen; die App bietet keine Tabelle, keinen Filter, keine Sortierung und keinen Download.</p>",
+    "<p>Optionale Metadaten (Ressourcen-Titel/Beschreibung, Datensatz-Titel) werden – wenn die URLs eine CKAN-Struktur enthalten – über <code>resource_show</code>/<code>package_show</code> abgeleitet aus <code>apiurls.messwerte</code>/<code>urlDaten</code> geladen; die App bietet keine Tabelle, keinen Filter, keine Sortierung und keinen Download.</p>",
     "<p>Welche Zeiträume und wie viele Datensätze tatsächlich verfügbar sind und wie aktuell die Quelle gepflegt ist, hängt von der jeweiligen Quelle ab; angezeigt werden die in der Quelle vorhandenen Zeitreihen.</p>",
     "<h2>Datenquelle</h2>",
     "<p>Die Daten stammen aus der konfigurierten CSV-Ressource über das Open-Data-Portal.</p>",
@@ -47,7 +47,13 @@
     "App-Entwickler: Ondics GmbH | ",
     "Provided by: Ondics GmbH"
   ],
-  "apiurl": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv",
+  "apiurls": [
+    {
+      "name": "messwerte",
+      "label": "URL zu den Daten",
+      "url": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv"
+    }
+  ],
   "sprache": "de",
   "chartType": "Aggregate Bar Chart",
   "weiterfuehrendeLinks": "<ul><li><a href=\"https://open-data-musterstadt.ckan.de/dataset/verlaufstestdaten\" target=\"_blank\">CKAN-Datensatz „Verlaufstestdaten\"</a></li><li><a href=\"https://www.umweltbundesamt.de/themen/wasser/fluesse/pegel\" target=\"_blank\">Umweltbundesamt – Pegelmesstechnik</a></li></ul>",

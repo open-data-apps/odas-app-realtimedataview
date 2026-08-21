@@ -3,7 +3,7 @@
   "app-entwickler-name": "ondics-gmbh",
   "name-in-url": "realtime-data-view",
   "name": "Realtime Data View",
-  "version": "1.29.0",
+  "version": "1.30.0",
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
   "kurzbeschreibung": "Visualisierung konfigurierbarer CSV-Zeitreihen mit Diagrammen und Kennzahlen.",
@@ -15,7 +15,7 @@
     "",
     "## Methodik",
     "",
-    "Die App lädt die in `apiurl` konfigurierte CSV-Zeitreihe direkt im Browser – im Live-Betrieb optional über den ODAS-Proxy (`proxyAktiv: ja` leitet über `/odp-data?path=...`, sonst direkter `fetch`). Der Abruf erfolgt im Browser; die Quelle muss dafür erreichbar sein.",
+    "Die App lädt die in `apiurls.messwerte` konfigurierte CSV-Zeitreihe direkt im Browser – im Live-Betrieb optional über den ODAS-Proxy (`proxyAktiv: ja` leitet über `/odp-data?path=...`, sonst direkter `fetch`). Der Abruf erfolgt im Browser; die Quelle muss dafür erreichbar sein.",
     "",
     "Das Parsen erkennt das Trennzeichen automatisch (Delimiter-Auto-Erkennung für `;`, `,`, Tab und `|`) und verarbeitet gequotete Felder mit doppelten Anführungszeichen sowie `CRLF`-Zeilenenden; Dezimalkomma wird akzeptiert (Komma zu Punkt normalisiert).",
     "",
@@ -25,7 +25,7 @@
     "",
     "Die Visualisierung bietet 17 Vega-Lite-Diagrammtypen (Line Chart, Bar Chart, Area Chart, Point Chart, Tick Chart, Circle Chart, Square Chart, Bar Chart Horizontal, Text Chart, Line with Color, Stacked Area, Stacked Bar, Layered Line+Point, Trellis Bar, Trellis Line, Histogram, Aggregate Bar Chart) über `vegaEmbed` (`vega`, `vega-lite`, `vega-embed`) und 3 KPI-Karten (Anzahl Datenpunkte/Row Count, Anzahl Kategorien/Category Count, aktuellster Wert/Latest Value) mit optionalen Erklärtexten aus `kpiKontext1–3`.",
     "",
-    "Optionale Metadaten (Ressourcen-Titel/Beschreibung, Datensatz-Titel) werden – wenn die URLs eine CKAN-Struktur enthalten – über `resource_show`/`package_show` abgeleitet aus `apiurl`/`urlDaten` geladen; die App bietet keine Tabelle, keinen Filter, keine Sortierung und keinen Download.",
+    "Optionale Metadaten (Ressourcen-Titel/Beschreibung, Datensatz-Titel) werden – wenn die URLs eine CKAN-Struktur enthalten – über `resource_show`/`package_show` abgeleitet aus `apiurls.messwerte`/`urlDaten` geladen; die App bietet keine Tabelle, keinen Filter, keine Sortierung und keinen Download.",
     "",
     "Welche Zeiträume und wie viele Datensätze tatsächlich verfügbar sind und wie aktuell die Quelle gepflegt ist, hängt von der jeweiligen Quelle ab; angezeigt werden die in der Quelle vorhandenen Zeitreihen.",
     "",
@@ -174,7 +174,7 @@
         "",
         "## Methodik",
         "",
-        "Die App lädt die in `apiurl` konfigurierte CSV-Zeitreihe direkt im Browser – im Live-Betrieb optional über den ODAS-Proxy (`proxyAktiv: ja` leitet über `/odp-data?path=...`, sonst direkter `fetch`). Der Abruf erfolgt im Browser; die Quelle muss dafür erreichbar sein.",
+        "Die App lädt die in `apiurls.messwerte` konfigurierte CSV-Zeitreihe direkt im Browser – im Live-Betrieb optional über den ODAS-Proxy (`proxyAktiv: ja` leitet über `/odp-data?path=...`, sonst direkter `fetch`). Der Abruf erfolgt im Browser; die Quelle muss dafür erreichbar sein.",
         "",
         "Das Parsen erkennt das Trennzeichen automatisch (Delimiter-Auto-Erkennung für `;`, `,`, Tab und `|`) und verarbeitet gequotete Felder mit doppelten Anführungszeichen sowie `CRLF`-Zeilenenden; Dezimalkomma wird akzeptiert (Komma zu Punkt normalisiert).",
         "",
@@ -184,7 +184,7 @@
         "",
         "Die Visualisierung bietet 17 Vega-Lite-Diagrammtypen (Line Chart, Bar Chart, Area Chart, Point Chart, Tick Chart, Circle Chart, Square Chart, Bar Chart Horizontal, Text Chart, Line with Color, Stacked Area, Stacked Bar, Layered Line+Point, Trellis Bar, Trellis Line, Histogram, Aggregate Bar Chart) über `vegaEmbed` (`vega`, `vega-lite`, `vega-embed`) und 3 KPI-Karten (Anzahl Datenpunkte/Row Count, Anzahl Kategorien/Category Count, aktuellster Wert/Latest Value) mit optionalen Erklärtexten aus `kpiKontext1–3`.",
         "",
-        "Optionale Metadaten (Ressourcen-Titel/Beschreibung, Datensatz-Titel) werden – wenn die URLs eine CKAN-Struktur enthalten – über `resource_show`/`package_show` abgeleitet aus `apiurl`/`urlDaten` geladen; die App bietet keine Tabelle, keinen Filter, keine Sortierung und keinen Download.",
+        "Optionale Metadaten (Ressourcen-Titel/Beschreibung, Datensatz-Titel) werden – wenn die URLs eine CKAN-Struktur enthalten – über `resource_show`/`package_show` abgeleitet aus `apiurls.messwerte`/`urlDaten` geladen; die App bietet keine Tabelle, keinen Filter, keine Sortierung und keinen Download.",
         "",
         "Welche Zeiträume und wie viele Datensätze tatsächlich verfügbar sind und wie aktuell die Quelle gepflegt ist, hängt von der jeweiligen Quelle ab; angezeigt werden die in der Quelle vorhandenen Zeitreihen.",
         "",
@@ -292,17 +292,24 @@
       },
       "erforderlich": "ja"
     },
-    "apiurl": {
-      "label": "URL zu den Daten",
+    "apiurls": {
+      "label": "URLs zu Datenressourcen",
       "category": "datenherkunft",
-      "hilfe": "Direkter, maschinenlesbarer Endpunkt, von dem die App die Ressourcen lädt — nicht die Datensatzseite im ODP (siehe „URL zum Datensatz im ODP\").",
+      "hilfe": "Direkter Download-, Datei- oder API-Endpunkt der tatsächlich verwendeten Datenquelle(n). Mehrere Einträge möglich.",
+      "typ": "array",
       "format": {
         "typ": "url",
-        "laenge": 255
+        "laenge": 500
       },
-      "default": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv",
-      "beispiel": "",
-      "erforderlich": "ja"
+      "urls": [
+        {
+          "name": "messwerte",
+          "label": "URL zu den Daten",
+          "default": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv",
+          "beispiel": "",
+          "erforderlich": "ja"
+        }
+      ]
     },
     "sprache": {
       "label": "Sprache der App",

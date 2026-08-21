@@ -1,6 +1,6 @@
 /*
 - Diese Funktion ist für die Inhalte der Startseite zuständig.
-- @param {Object} configdata - Konfigurationsdaten (enthält apiurl)
+- @param {Object} configdata - Konfigurationsdaten (enthält apiurls)
 - @param {HTMLElement} enclosingHtmlDivElement - Container für den Content
 - @returns {null}
 */
@@ -168,6 +168,17 @@ function parseCsv(text, delimiter) {
   return rows;
 }
 
+/**
+ * Löst eine benannte Datenressource aus configdata.apiurls auf.
+ * Neue apiurls-Form (typ: "array"); das frühere skalare apiurl wird nicht mehr gelesen.
+ * @returns {string} getrimmte URL, oder "" für den Zustand "keine Quelle konfiguriert"
+ */
+function getOdasApiUrl(configdata, name) {
+  const liste = Array.isArray(configdata && configdata.apiurls) ? configdata.apiurls : [];
+  const treffer = liste.find((eintrag) => eintrag && eintrag.name === name);
+  return String((treffer && treffer.url) || "").trim();
+}
+
 async function fetchOdasJson(targetUrl, configdata = {}) {
   const rawContent = await fetchOdasResource(targetUrl, configdata);
   try {
@@ -191,7 +202,8 @@ function describeNonJsonPayload(rawContent) {
 }
 
 async function app(configdata = {}, enclosingHtmlDivElement) {
-  const quelle = String(configdata.apiurl || "").trim();
+  configdata = { ...configdata, apiurl: getOdasApiUrl(configdata, "messwerte") };
+  const quelle = configdata.apiurl;
   if (!quelle || /^\{\{.*\}\}$/.test(quelle) || /^<.*>$/.test(quelle)) {
     enclosingHtmlDivElement.innerHTML =
       '<div class="alert alert-info" role="alert">Es ist keine Datenquelle konfiguriert.</div>';
