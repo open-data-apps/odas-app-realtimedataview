@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.29.0 - 2026-08-20
+- Markdown-Metadaten: Paketbeschreibungen auf echtes Markdown umgestellt, exakte Identität Top-Level/Instanz hergestellt, lokale HTML-Fixture semantisch gespiegelt.
 
 ## 1.28.0 - 2026-08-20
 - FIX: Infobar-/KPI-Textmutationen werden jetzt ebenfalls durch den bestehenden `disposed`/`vegaRenderToken`-Guard geschützt, nicht mehr nur der Chart-Embed selbst (F-70)

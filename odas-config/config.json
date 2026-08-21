@@ -7,19 +7,23 @@
   "dateneinheit": "Einheiten",
   "datenpunktlimit": 50,
   "beschreibung": [
-    "<p>Die Realtime Data View-App visualisiert Zeitreihen und Messdaten aus offenen Datenquellen.</p>",
-    "<p>Sie stellt Werte in auswählbaren Diagrammtypen dar und unterstützt den schnellen Blick auf aktuelle Entwicklungen.</p>",
-    "<h3>Inhalte</h3>",
-    "<p>Die App verarbeitet CSV-Daten mit Zeitstempel, Messwerten und optionalen Kategorien. Linien-, Balken- oder Flächendiagramme helfen, Trends und Veränderungen zu erkennen.</p>",
-    "<h3>Nutzung</h3>",
-    "<p>Wählen Sie die gewünschte Visualisierung, betrachten Sie den Verlauf und grenzen Sie bei Bedarf die angezeigten Daten ein. Die App zeigt die gelieferten Daten der Quelle und ergänzt keine fachliche Bewertung.</p>",
-    "<h3>Für wen ist diese App?</h3>",
-    "<p>Die App richtet sich an Bürger:innen, Fachstellen, Verwaltung und Betreiber offener Sensordaten, die Messreihen verständlich darstellen möchten. Besondere Datenkenntnisse sind für die Nutzung nicht erforderlich.</p>",
-    "<h3>Datenquelle</h3>",
-    "<p>Die Daten werden aus der konfigurierten CSV-Ressource geladen und im Browser visualisiert.</p>",
+    "<p>Die Realtime Data View-App visualisiert konfigurierbare CSV-Zeitreihen als interaktive Diagramme und Kennzahlen.</p>",
+    "<p>Sie lädt Messreihen mit Zeitstempel und Messwerten aus einer offenen CSV-Ressource und macht aktuelle Entwicklungen sowie optionale Kategorien im Browser nachvollziehbar – ohne fachliche Bewertung und ohne Anspruch auf Vollständigkeit.</p>",
+    "<h2>Methodik</h2>",
+    "<p>Die App lädt die in <code>apiurl</code> konfigurierte CSV-Zeitreihe direkt im Browser – im Live-Betrieb optional über den ODAS-Proxy (<code>proxyAktiv: ja</code> leitet über <code>/odp-data?path=...</code>, sonst direkter <code>fetch</code>). Der Abruf erfolgt im Browser; die Quelle muss dafür erreichbar sein.</p>",
+    "<p>Das Parsen erkennt das Trennzeichen automatisch (Delimiter-Auto-Erkennung für <code>;</code>, <code>,</code>, Tab und <code>|</code>) und verarbeitet gequotete Felder mit doppelten Anführungszeichen sowie <code>CRLF</code>-Zeilenenden; Dezimalkomma wird akzeptiert (Komma zu Punkt normalisiert).</p>",
+    "<p>Erwartet werden <code>date</code> (Zeitstempel) und <code>value</code> (Messwert) als Pflichtspalten, optional <code>category</code> zur Gruppierung; zusätzliche Spalten werden ignoriert. Jede Zeile ohne verwertbaren <code>date</code>/<code>value</code> wird verworfen und gezählt – ein Hinweis zeigt die Anzahl verworfener Zeilen.</p>",
+    "<p>Es werden die letzten N Datensätze bis zum konfigurierten Limit (<code>datenpunktlimit</code>, maximal 9999) angezeigt; die App wahrt die Quellreihenfolge. Die Anzeige aktualisiert alle 10 Sekunden per Polling, solange die Startseite gemountet ist – kein Streaming, kein WebSocket und keine Live-Garantie, die Darstellung spiegelt den Stand der Quelle.</p>",
+    "<p>Die Visualisierung bietet 17 Vega-Lite-Diagrammtypen (Line Chart, Bar Chart, Area Chart, Point Chart, Tick Chart, Circle Chart, Square Chart, Bar Chart Horizontal, Text Chart, Line with Color, Stacked Area, Stacked Bar, Layered Line+Point, Trellis Bar, Trellis Line, Histogram, Aggregate Bar Chart) über <code>vegaEmbed</code> (<code>vega</code>, <code>vega-lite</code>, <code>vega-embed</code>) und 3 KPI-Karten (Anzahl Datenpunkte/Row Count, Anzahl Kategorien/Category Count, aktuellster Wert/Latest Value) mit optionalen Erklärtexten aus <code>kpiKontext1–3</code>.</p>",
+    "<p>Optionale Metadaten (Ressourcen-Titel/Beschreibung, Datensatz-Titel) werden – wenn die URLs eine CKAN-Struktur enthalten – über <code>resource_show</code>/<code>package_show</code> abgeleitet aus <code>apiurl</code>/<code>urlDaten</code> geladen; die App bietet keine Tabelle, keinen Filter, keine Sortierung und keinen Download.</p>",
+    "<p>Welche Zeiträume und wie viele Datensätze tatsächlich verfügbar sind und wie aktuell die Quelle gepflegt ist, hängt von der jeweiligen Quelle ab; angezeigt werden die in der Quelle vorhandenen Zeitreihen.</p>",
+    "<h2>Datenquelle</h2>",
+    "<p>Die Daten stammen aus der konfigurierten CSV-Ressource über das Open-Data-Portal.</p>",
     "<ul><li><strong>Open Data Portal:</strong> <a href=\"https://open-data-musterstadt.ckan.de\" target=\"_blank\" rel=\"noopener\">Open Data Musterstadt</a></li><li><strong>Datensatz:</strong> <a href=\"https://open-data-musterstadt.ckan.de/dataset/verlaufstestdaten\" target=\"_blank\" rel=\"noopener\">Verlaufstestdaten</a></li><li><strong>Ressource:</strong> <a href=\"https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv\" target=\"_blank\" rel=\"noopener\">CSV-Ressource</a></li></ul>",
-    "<h3>Open Data App Store</h3>",
-    "<p>Diese App ist für den Open Data App Store vorbereitet und kann mit kommunalen Echtzeit-, Sensor- oder Verlaufdaten konfiguriert werden.</p>"
+    "<p>Verfügbarkeit und Aktualität hängen vom Pflegestand der Quelle ab; die App zeigt die gelieferten Zeitreihen im Browser.</p>",
+    "<h2>Open Data App</h2>",
+    "<p>Diese App ist eine Open Data App und kann im <a href=\"https://open-data-app-store.de/\" target=\"_blank\" rel=\"noopener\">Open Data App Store</a> betrieben werden. Sie ist Open Source und lässt sich mit kommunalen CSV-Zeitreihen konfigurieren.</p>",
+    "<ul><li><a href=\"https://open-data-app-store.de/\" target=\"_blank\" rel=\"noopener\">Open Data App Store</a> – die Plattform für Open Data Apps</li><li><a href=\"https://github.com/open-data-apps\" target=\"_blank\" rel=\"noopener\">Alle Open Data Apps auf GitHub</a> – die Organisation mit allen Apps</li><li><a href=\"https://github.com/open-data-apps/odas-app-realtimedataview\" target=\"_blank\" rel=\"noopener\">odas-app-realtimedataview</a> – das Repository dieser App</li></ul>"
   ],
   "kontakt": [
     "Tel.: <a href='tel:+49711310093100'>0711-31009-3100</a><br>",
@@ -51,6 +55,6 @@
   "kpiKontext1": "Anzahl der geladenen Messwerte aus der Datenquelle. Zeigt den Umfang des analysierten Zeitreihen-Datensatzes.",
   "kpiKontext2": "Anzahl der verschiedenen Kategorien im Datensatz. Zeigt, wie viele unterschiedliche Messgrößen oder Gruppen erfasst wurden.",
   "kpiKontext3": "Der aktuellste Messwert aus der Zeitreihe mit Einheit. Zeigt den neuesten verfügbaren Datenstand der Quelle.",
-  "datenStand": "Stand: Live-Abruf aus der konfigurierten CSV-Ressource",
+  "datenStand": "Stand: Abruf aus der konfigurierten CSV-Ressource",
   "brandingCSSFile": "../assets/branding.css"
 }
