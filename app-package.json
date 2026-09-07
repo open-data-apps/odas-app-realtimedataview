@@ -3,7 +3,7 @@
   "app-entwickler-name": "ondics-gmbh",
   "name-in-url": "realtime-data-view",
   "name": "Realtime Data View",
-  "app-version": "1.32.0",
+  "app-version": "1.32.1",
   "app-package-version": "2",
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
@@ -307,7 +307,7 @@
           "name": "messwerte",
           "label": "Datei-Download – Messwerte",
           "default": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv",
-          "beispiel": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/download/messwerte.json",
+          "beispiel": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv",
           "erforderlich": "ja"
         }
       ]
@@ -415,7 +415,7 @@
   "daten": {
     "beschreibung": "Die Realtime Data View-App verarbeitet konfigurierbare CSV-Zeitreihen aus dem Open Data Portal und visualisiert sie als Diagramme.",
     "schema": "assets/schema.json",
-    "beispiel": "",
-    "beispiel-url": ""
+    "beispiel": "Komma-getrennte CSV-Zeitreihe mit Kopfzeile (Spalten date, value, optionale category).",
+    "beispiel-url": "https://open-data-musterstadt.ckan.de/dataset/8c71c4ca-5a25-4e97-ba60-ab4e8b5d0fe4/resource/d043abbb-666e-4fd3-bb97-5266fb9fbe8e/download/pegelstand_musterbach_messpunkt_vorstadt.csv"
   }
 }
