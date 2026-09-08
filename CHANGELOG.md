@@ -1,7 +1,9 @@
 # Changelog
 
-## 1.32.1 - 2026-09-07
+## 1.32.2 - 2026-09-08
 - **FIX:** Variante-A-Verdrahtung (F-92): Typprüfung (ckan-dl) vor dem ersten Fetch; Quellen- und Ladefehler über `renderOdasFehler`; Lifecycle-Fixtures typkonform umgestellt (1.32.1 -> 1.32.2).
+
+## 1.32.1 - 2026-09-07
 - **FIX:** Frictionless-Härtung: `assets/schema.json` mit `$schema`, Titeln und Beschreibungen; totes JSON-Beispiel (404) auf funktionierenden CSV-Default angeglichen; `daten.beispiel`/`beispiel-url` befüllt.
 
 ## 1.32.0 - 2026-08-25
