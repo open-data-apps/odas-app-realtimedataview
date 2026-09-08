@@ -364,8 +364,28 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
   configdata = { ...configdata, apiurl: getOdasApiUrl(configdata, "messwerte") };
   const quelle = configdata.apiurl;
   if (!quelle || /^\{\{.*\}\}$/.test(quelle) || /^<.*>$/.test(quelle)) {
-    enclosingHtmlDivElement.innerHTML =
-      '<div class="alert alert-info" role="alert">Es ist keine Datenquelle konfiguriert.</div>';
+    renderOdasFehler(
+      enclosingHtmlDivElement,
+      new Error("Keine Datenquelle konfiguriert."),
+      {
+        url: quelle,
+        label: "Messwerte-Datei",
+        typLabel: "Datei-Download",
+        erwarteterTyp: "ckan-dl",
+      },
+    );
+    return;
+  }
+
+  // Variante A (F-92): Typprüfung vor dem ersten Fetch.
+  const rtTypWarn = validateUrlTypErwartung(quelle, "ckan-dl");
+  if (rtTypWarn) {
+    renderOdasFehler(enclosingHtmlDivElement, new Error(rtTypWarn), {
+      url: quelle,
+      label: "Messwerte-Datei",
+      typLabel: "Datei-Download",
+      erwarteterTyp: "ckan-dl",
+    });
     return;
   }
 
@@ -933,10 +953,12 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       if (badge) badge.textContent = "Letzte Datenladung: " + nowStr;
     } catch (err) {
       if (state.disposed || renderToken !== state.vegaRenderToken) return;
-      const alert = document.createElement("div");
-      alert.className = "alert alert-danger text-center";
-      alert.textContent = `Fehler: ${err.message}`;
-      startseiteContainer.appendChild(alert);
+      renderOdasFehler(startseiteContainer, err, {
+        url: quelle,
+        label: "Messwerte-Datei",
+        typLabel: "Datei-Download",
+        erwarteterTyp: "ckan-dl",
+      });
       console.error(err);
     } finally {
       // F-57/F-70: nach onPageLeave keine Spinner-Mutation mehr (post-dispose-
