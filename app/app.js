@@ -104,18 +104,21 @@ async function fetchViaOdasProxy(targetUrl, options = {}) {
   return proxyData.content;
 }
 
-async function fetchOdasResource(targetUrl, configdata = {}) {
+async function fetchOdasResource(targetUrl, configdata = {}, options = {}) {
   if (isOdasProxyEnabled(configdata)) {
-    return fetchViaOdasProxy(targetUrl);
+    return fetchViaOdasProxy(targetUrl, options);
   }
 
   try {
-    const response = await fetch(targetUrl);
+    const response = await fetch(targetUrl, {
+      signal: options && options.signal ? options.signal : undefined,
+    });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
     return response.text();
   } catch (error) {
+    if (error && error.name === "AbortError") throw error;
     throw new Error(
       `Direkter Datenabruf fehlgeschlagen (${error.message}). Bitte prüfen Sie die Daten-URL und die CORS-Freigabe der Datenquelle.`,
     );
@@ -190,8 +193,8 @@ function getOdasApiUrl(configdata, name) {
   return String((treffer && treffer.url) || "").trim();
 }
 
-async function fetchOdasJson(targetUrl, configdata = {}) {
-  const rawContent = await fetchOdasResource(targetUrl, configdata);
+async function fetchOdasJson(targetUrl, configdata = {}, options = {}) {
+  const rawContent = await fetchOdasResource(targetUrl, configdata, options);
   try {
     return JSON.parse(rawContent);
   } catch (_error) {
@@ -350,15 +353,6 @@ function renderOdasFehler(container, error, kontext = {}) {
   container.innerHTML = `<div class="alert ${alertClass}" role="alert"><strong>${escapeHtml(titel)}</strong><p class="mb-1">${escapeHtml(info.hinweis)}</p>${urlZeile}<details class="small"><summary>Details</summary><code>${escapeHtml(info.detail || String(error))}</code></details></div>`;
 }
 
-function isLeerErgebnis(json) {
-  if (!json) return true;
-  if (Array.isArray(json) && json.length === 0) return true;
-  if (Array.isArray(json.records) && json.records.length === 0) return true;
-  if (Array.isArray(json.results) && json.results.length === 0) return true;
-  if (json.result && Array.isArray(json.result.records) && json.result.records.length === 0) return true;
-  return false;
-}
-
 
 async function app(configdata = {}, enclosingHtmlDivElement) {
   configdata = { ...configdata, apiurl: getOdasApiUrl(configdata, "messwerte") };
@@ -396,6 +390,9 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     config: configdata,
     disposed: false, // wird in Task 9 (onPageLeave) gesetzt
     updateInterval: null,
+    fetchController: null, // RT-B4: laufender CSV-Abruf ist abbrechbar
+    fehlerInFolge: 0, // RT-B4: Grundlage fuer den Poll-Backoff
+    pollZaehler: 0,
     // F-57: gehaltenes vegaEmbed-Result (Result-Objekt mit finalize()) und ein
     // monoton wachsender Render-Token, der verspaetete/ueberholte Embeds als
     // stale markiert (kein Leak, kein Ueberschreiben belegter Results).
@@ -407,12 +404,25 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
   // waehrend des initialen Loads (der spätere Fetch-/Embed-Ergebnisse
   // wirkungslos machen muss) abgedeckt (frueher lag die Registrierung erst
   // am Ende von app() und war waehrend des initialen Loads nicht erreichbar).
+  // RT-B1: Vorgaenger-Instanz desselben Containers zuerst abraeumen. Ohne das
+  // blieb ihr Polling-Intervall aktiv, holte weiter Daten und schrieb ueber die
+  // gemeinsame ID #rt-kpi-row in die Kacheln der NEUEN Instanz.
+  const rtVorherigerCleanup = rtCleanupRegistry.get(enclosingHtmlDivElement);
+  if (rtVorherigerCleanup) {
+    try {
+      rtVorherigerCleanup();
+    } catch (_e) {}
+  }
   rtCleanupRegistry.set(enclosingHtmlDivElement, () => {
     state.disposed = true;
     state.vegaRenderToken++; // alle laufenden/ueberholten Embeds als stale markieren
     if (state.updateInterval) {
       clearInterval(state.updateInterval);
       state.updateInterval = null;
+    }
+    if (state.fetchController) {
+      state.fetchController.abort();
+      state.fetchController = null;
     }
     if (state.vegaResult) {
       state.vegaResult.finalize();
@@ -566,7 +576,10 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       rowAndChartContainer.appendChild(flexRow);
       
       var kpiRow = document.createElement("div");
-      kpiRow.id = "rt-kpi-row";
+      // RT-B3: Diese ID wird gegen den gemeinsamen Container aufgeloest (unten
+      // via enclosingHtmlDivElement) — sie muss instanz-eindeutig sein, sonst
+      // schreibt eine fremde Instanz in diese Kacheln.
+      kpiRow.id = "rt-kpi-row-" + state.uid;
       kpiRow.className = "row g-3 mb-3";
       rowAndChartContainer.appendChild(kpiRow);
       rowAndChartContainer.appendChild(chartDiv);
@@ -612,14 +625,16 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       <span class='fw-bold ms-2'> Datum des Wertes:</span>
       <span>${escapeHtml(lastMod)}</span>
       ${spinnerHtml}
-      <br><small id="rt-datenladung" class="text-muted"></small>
+      <br><small id="rt-datenladung-${state.uid}" class="text-muted"></small>
     `;
 
     var totalRecords = data.length;
     var categories = [...new Set(data.filter(function(d) { return d.category; }).map(function(d) { return d.category; }))].length;
     var latestVal = latestValue;
     
-    var kpiRowEl = enclosingHtmlDivElement.querySelector("#rt-kpi-row");
+    var kpiRowEl = enclosingHtmlDivElement.querySelector(
+      "#rt-kpi-row-" + state.uid,
+    );
     if (kpiRowEl) {
       kpiRowEl.innerHTML = '<div class="col-6 col-md-4"><div class="card border-primary h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-primary">' + totalRecords + '</div><div class="text-muted small">Datenpunkte</div>' + kpiContext(configdata.kpiKontext1, "1", state.uid) + '</div></div></div>' +
         '<div class="col-6 col-md-4"><div class="card border-info h-100"><div class="card-body text-center py-3"><div class="fs-3 fw-bold text-info">' + categories + '</div><div class="text-muted small">Kategorien</div>' + kpiContext(configdata.kpiKontext2, "2", state.uid) + '</div></div></div>' +
@@ -898,9 +913,17 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
     if (spinnerElem) spinnerElem.style.display = "inline-block";
 
     try {
+      // RT-B4: Ein neuer Ladevorgang bricht den vorherigen Abruf ab, damit sich
+      // bei langsamen Quellen keine Downloads stapeln.
+      if (state.fetchController) state.fetchController.abort();
+      state.fetchController = new AbortController();
       // CSV-Daten laden: direkt oder ueber den ODAS-Proxy (proxyAktiv)
-      const csvText = await fetchOdasResource(configdata.apiurl, configdata);
+      const csvText = await fetchOdasResource(configdata.apiurl, configdata, {
+        signal: state.fetchController.signal,
+      });
       if (state.disposed || renderToken !== state.vegaRenderToken) return;
+      // RT-B4: Ein erfolgreicher Ladevorgang setzt den Fehler-Backoff zurueck.
+      state.fehlerInFolge = 0;
       const { rows: geparst, verworfen } = parseCSV(csvText);
       let data = geparst;
 
@@ -949,10 +972,14 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
       }
 
       var nowStr = new Date().toLocaleString("de-DE");
-      var badge = enclosingHtmlDivElement.querySelector("#rt-datenladung");
+      var badge = enclosingHtmlDivElement.querySelector(
+        "#rt-datenladung-" + state.uid,
+      );
       if (badge) badge.textContent = "Letzte Datenladung: " + nowStr;
     } catch (err) {
       if (state.disposed || renderToken !== state.vegaRenderToken) return;
+      if (err && err.name === "AbortError") return;
+      state.fehlerInFolge++;
       renderOdasFehler(startseiteContainer, err, {
         url: quelle,
         label: "Messwerte-Datei",
@@ -978,9 +1005,16 @@ async function app(configdata = {}, enclosingHtmlDivElement) {
   // Automatische Aktualisierung alle 10 Sekunden - nur auf der Startseite
   state.updateInterval = setInterval(() => {
     // Prüfe ob wir noch auf der Startseite sind
-    if (enclosingHtmlDivElement.querySelector(".startseite-content")) {
-      loadAndRender();
+    if (!enclosingHtmlDivElement.querySelector(".startseite-content")) return;
+    // RT-B4: Nach wiederholten Fehlern nicht weiter im 10-Sekunden-Takt
+    // anklopfen. Bewusst deterministisch (Zaehler statt Uhrzeit), damit das
+    // Verhalten reproduzierbar bleibt: 1x, dann jeder 2., 4., 8. Poll.
+    state.pollZaehler++;
+    if (state.fehlerInFolge > 0) {
+      const ueberspringen = Math.pow(2, Math.min(state.fehlerInFolge, 3));
+      if (state.pollZaehler % ueberspringen !== 0) return;
     }
+    loadAndRender();
   }, 10000);
 
   return null; // explizit null zurückgeben, kein Promise
@@ -1095,6 +1129,15 @@ function loadScriptOnce(src) {
   });
 }
 
+// RT-B2: Der Cache wird nach einem Fehlschlag freigegeben, damit ein neuer
+// Versuch moeglich ist — vorher blieb die abgelehnte Promise im Modul-Global
+// stehen, und jeder weitere Ladeweg (auch der 10-Sekunden-Poll) scheiterte
+// identisch.
+function resetVegaLoadPromise() {
+  if (!vegaLoadPromise) return;
+  vegaLoadPromise = null;
+}
+
 function loadVega() {
   if (typeof vegaEmbed !== "undefined") return Promise.resolve();
   if (vegaLoadPromise) return vegaLoadPromise;
@@ -1103,14 +1146,21 @@ function loadVega() {
     "vendor/vega/vega.min.js",
     "vendor/vega/vega-lite.min.js",
     "vendor/vega/vega-embed.min.js",
-  ].reduce(
-    (kette, src) => kette.then(() => loadScriptOnce(src)),
-    Promise.resolve(),
-  );
+  ]
+    .reduce(
+      (kette, src) => kette.then(() => loadScriptOnce(src)),
+      Promise.resolve(),
+    )
+    .catch((err) => {
+      resetVegaLoadPromise();
+      throw err;
+    });
   return vegaLoadPromise;
 }
 
 /*
 - Vega wird bei Bedarf über loadVega() geladen, nicht mehr hier.
 */
-function addToHead() {}
+function addToHead() {
+  return ``;
+}

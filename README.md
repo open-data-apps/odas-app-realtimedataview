@@ -13,12 +13,15 @@ Die APP ist eine Single Page Application Webapp. Mit:
 - Logo Anzeige
 - Menü
 - Seiten für Impressum, Datenschutz, Beschreibung, Kontakt, Hauptinhalt
-- Inhaltsbereich mit Visualisierung von Daten
 - Fußzeile
+- Visualisierung einer CSV-Messreihe (`date`, `value`, optional `category`) als Vega-Lite-Diagramm;
+  der Chart-Typ ist konfigurierbar (18 Varianten, u. a. Linie, Balken, Fläche, Histogramm, Trellis, gestapelt)
+- Kennzahlen zu Datenpunkten, Kategorien und aktuellem Wert (mit optionalen Kontexttexten)
+- Automatische Aktualisierung alle 10 Sekunden; bei wiederholten Fehlern wird der Abruf gedrosselt
+- Konfigurierbares Datenpunkt-Limit, Anzeige der zuletzt gelesenen Datensätze und ein Hinweis,
+  wenn Zeilen der Quelle nicht lesbar waren
 
 Die Konfiguration wird vom ODAS geladen.
-
-Die APP zeigt Ihre Konfiguration im CSV Format an.
 
 #### Desktop Version
 

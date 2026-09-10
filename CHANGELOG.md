@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.32.3 - 2026-09-10
+- **FIX (RT-B1):** `rtCleanupRegistry.set(...)` ohne Vorgänger-Cleanup: Der alte 10-Sekunden-Poll lief dauerhaft weiter, holte weiter Daten und schrieb seine KPI-Kacheln über die gemeinsame ID `#rt-kpi-row` in die **neue** Instanz. Jetzt wird die Vorgänger-Instanz zuerst abgeräumt.
+- **FIX (RT-B2):** Ein fehlgeschlagener Vega-Ladevorgang vergiftete den Modul-Cache (`vegaLoadPromise` blieb abgelehnt) — und weil die App alle 10 s pollt, wiederholte sich die Fehlermeldung endlos, ohne dass ein Erfolg möglich war. Der Cache wird jetzt über `resetVegaLoadPromise()` freigegeben.
+- **FIX (RT-B3):** Die IDs, die gegen den **gemeinsamen** Container aufgelöst werden (`#rt-kpi-row`, `#rt-datenladung`), sind jetzt instanz-eindeutig. `#data-spinner` bleibt bewusst statisch: Es wird nur im eigenen Instanzcontainer gesucht und ist damit kollisionsfrei.
+- **FIX (RT-B4):** Der CSV-Abruf ist per `AbortController` abbrechbar (ein neuer Ladevorgang bricht den vorherigen ab, der Teardown ebenfalls); wiederholte Fehler drosseln das Polling deterministisch (1×, dann jeder 2./4./8. Durchlauf) statt weiter im 10-Sekunden-Takt anzuklopfen.
+- **TECH (RT-B5):** `isLeerErgebnis` entfernt; `addToHead` gibt `""` statt `undefined` zurück.
+- **DOC:** Der README-Abschnitt „Funktionen" beschrieb noch den Template-Zustand („zeigt Ihre Konfiguration im CSV Format an") und nennt jetzt die tatsächlichen Funktionen.
+
 ## 1.32.2 - 2026-09-08
 - **FIX:** Variante-A-Verdrahtung (F-92): Typprüfung (ckan-dl) vor dem ersten Fetch; Quellen- und Ladefehler über `renderOdasFehler`; Lifecycle-Fixtures typkonform umgestellt (1.32.1 -> 1.32.2).
 
