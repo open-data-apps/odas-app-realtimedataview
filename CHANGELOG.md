@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.32.4 - 2026-10-02
+- ENH: Verwendete ODAS-Dienste in `odas-services` deklariert.
+
 ## 1.32.3 - 2026-09-10
 - **FIX (RT-B1):** `rtCleanupRegistry.set(...)` ohne Vorgänger-Cleanup: Der alte 10-Sekunden-Poll lief dauerhaft weiter, holte weiter Daten und schrieb seine KPI-Kacheln über die gemeinsame ID `#rt-kpi-row` in die **neue** Instanz. Jetzt wird die Vorgänger-Instanz zuerst abgeräumt.
 - **FIX (RT-B2):** Ein fehlgeschlagener Vega-Ladevorgang vergiftete den Modul-Cache (`vegaLoadPromise` blieb abgelehnt) — und weil die App alle 10 s pollt, wiederholte sich die Fehlermeldung endlos, ohne dass ein Erfolg möglich war. Der Cache wird jetzt über `resetVegaLoadPromise()` freigegeben.
