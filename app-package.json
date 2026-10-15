@@ -3,7 +3,7 @@
   "app-entwickler-name": "ondics-gmbh",
   "name-in-url": "realtime-data-view",
   "name": "Realtime Data View",
-  "app-version": "1.32.5",
+  "app-version": "1.32.6",
   "app-package-version": "2",
   "odas-app-icon": "assets/odas-app-icon.svg",
   "app-icon": "assets/odas-app-icon.svg",
@@ -59,7 +59,12 @@
     "Zeitreihen"
   ],
   "screenshots": [
-    "assets/Desktop_Screenshot.png"
+    "assets/Desktop_Screenshot.png",
+    "assets/Desktop_Screenshot_2.png",
+    "assets/Desktop_Screenshot_3.png",
+    "assets/Mobile_Screenshot.png",
+    "assets/Mobile_Screenshot_2.png",
+    "assets/Mobile_Screenshot_3.png"
   ],
   "branding-css": "",
   "api-version": "1",
