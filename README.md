@@ -79,3 +79,7 @@ Beim Aufruf dieser App werden keine externen Server für Programmbibliotheken ko
 ## Für wen ist diese App?
 
 Diese App zeigt Echtzeit-Sensordaten wie Pegelstände, Verkehrszahlen oder Wetterdaten. Sie richtet sich an Bürger:innen und Fachleute, die aktuelle Messwerte im Blick behalten möchten.
+
+## Lizenz
+
+Der App-Code steht unter der [MIT-Lizenz](LICENSE), © 2025 Ondics GmbH. Mitgelieferte Bibliotheken unter `app/vendor/` behalten ihre eigenen Lizenzen. Daten und Bilder aus den angebundenen Quellen behalten die Rechte der jeweiligen Quelle; die MIT-Lizenz gilt nicht für sie.
